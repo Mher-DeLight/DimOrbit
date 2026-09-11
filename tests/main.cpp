@@ -34,7 +34,7 @@ int main(int, char**) {
     earth.physics->transform.goTo(dez::Vec3{-8.0f, 0.0f, 0.0f});
     earth.physics->core.mass = 6e-6;
     earth.physics->enableCollisions(false);
-    earth.physics->core.applyVelocity(dez::Vec3{0.0f, 0.0f, 3.1414});
+    earth.physics->core.applyVelocity(dez::Vec3{0.0f, 0.0f, 2.2f});
 
     constexpr float CAM_SPEED = 5.0f;
     constexpr float CAM_VERTICAL_SPEED = 50.0f;
@@ -50,7 +50,7 @@ int main(int, char**) {
 
         cameraYaw += dez::input::getAxis(KEY_LEFT, KEY_RIGHT) * LOOK_SPEED * delta;
         cameraPitch += dez::input::getAxis(KEY_DOWN, KEY_UP) * LOOK_SPEED * delta;
-        cameraPitch = Clamp(cameraPitch, -1.5f, 1.5f);
+        cameraPitch = Clamp(cameraPitch, -1.5707f, 1.5707f);
 
         camera.direction = Vector3{
             std::cos(cameraPitch) * std::cos(cameraYaw),
@@ -88,9 +88,9 @@ int main(int, char**) {
         }
         EndMode3D();
 
-        dez::logger::flushLog("x: " + std::to_string(earth.physics->transform.position.x) +
-                              " y: " + std::to_string(earth.physics->transform.position.y) +
-                              " z: " + std::to_string(earth.physics->transform.position.z));
+        dez::logger::flushLog("x: " + std::to_string(camera.position.x) +
+                              " y: " + std::to_string(camera.position.y) +
+                              " z: " + std::to_string(camera.position.z));
         return true;
     });
 }
