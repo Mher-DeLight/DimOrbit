@@ -5,7 +5,7 @@
 int main(int, char**) {
     namespace dez = DimEngineZ;
     namespace dor = DimOrbit;
-    dez::manager::init(1000, 800, "Welcome");
+    dez::manager::init(1000, 800, "Gravity Simulation");
 
     auto camera = dez::Camera({-10.0f, 0.0f, 0.0f},
                               dez::CameraOptions{
@@ -13,6 +13,11 @@ int main(int, char**) {
                               },
                               MAIN_CAMERA);
     camera.setTarget(dez::Vec3{0.0f, 0.0f, 0.0f});
+
+    constexpr float GROUND_HEIGHT = -1.25f;
+    constexpr int GROUND_SLICES = 40;
+    constexpr float GROUND_SPACING = 1.0f;
+    constexpr float GROUND_EXTENT = GROUND_SLICES * GROUND_SPACING * 0.5f;
 
     auto mesh = GenMeshSphere(1.0f, 32, 32);
     auto drawobj = dez::DrawObject(std::move(mesh), dez::Transform(), YELLOW);
@@ -69,6 +74,20 @@ int main(int, char**) {
             dor::gravity::tick(simulationDelta);
             dez::manager::tick(simulationDelta);
         }
+
+        ClearBackground(BLACK);
+        BeginMode3D(camera);
+        sun.physics->core.shape.draw();
+        earth.physics->core.shape.draw();
+        for (int slice = 0; slice <= GROUND_SLICES; ++slice) {
+            const float offset = -GROUND_EXTENT + slice * GROUND_SPACING;
+            DrawLine3D(Vector3{-GROUND_EXTENT, GROUND_HEIGHT, offset},
+                       Vector3{GROUND_EXTENT, GROUND_HEIGHT, offset}, DARKGRAY);
+            DrawLine3D(Vector3{offset, GROUND_HEIGHT, -GROUND_EXTENT},
+                       Vector3{offset, GROUND_HEIGHT, GROUND_EXTENT}, DARKGRAY);
+        }
+        EndMode3D();
+
         dez::logger::flushLog("x: " + std::to_string(earth.physics->transform.position.x) +
                               " y: " + std::to_string(earth.physics->transform.position.y) +
                               " z: " + std::to_string(earth.physics->transform.position.z));
