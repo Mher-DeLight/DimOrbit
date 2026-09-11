@@ -1,5 +1,5 @@
 #pragma once
-#include "DimOrbit.h"
+#include "common.h"
 #include <vector>
 
 namespace DimOrbit::gravity {

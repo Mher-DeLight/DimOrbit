@@ -32,7 +32,7 @@ public:
         return Vec3(other.vec + vec);
     }
     Vec3 operator-(const Vec3& other) {
-        return Vec3(other.vec - vec);
+        return Vec3(vec - other.vec);
     }
     Vec3 operator*(const Vec3& other) {
         return Vec3(other.vec * vec);
