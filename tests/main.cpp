@@ -6,7 +6,7 @@ int main(int, char**) {
     namespace dor = DimOrbit;
     dez::manager::init(1000, 800, "Welcome");
 
-    auto camera = dez::Camera({0.0f, 5.0f, 10.0f},
+    auto camera = dez::Camera({0.0f, 0.0f, 10.0f},
                               dez::CameraOptions{
                                   .fovy = 90.0f,
                               },
@@ -23,13 +23,17 @@ int main(int, char**) {
     drawobj = dez::DrawObject(std::move(mesh), dez::Transform(), GREEN);
     physicsObject = std::make_unique<dez::PhysicsObject>(std::move(drawobj));
     auto gravityObj2 = dor::GravityBody(std::move(physicsObject));
-    gravityObj2.physics->transform.goTo(dez::Vec3{3.0f, 0.0f, 0.0f});
+    gravityObj2.physics->transform.goTo(dez::Vec3{3.0f, 5.0f, 0.0f});
     gravityObj2.physics->core.mass = 1.0e11f;
 
+    constexpr float CAM_SPEED = 0.13f;
     return dez::manager::main(60, [&](float delta) {
-        if (dez::input::isKeyPressed(KEY_Q)) {
+        if (dez::input::isKeyPressed(KEY_ESCAPE)) {
             exit(0);
         }
+        camera.moveX(dez::input::getAxis(KEY_A, KEY_D) * CAM_SPEED);
+        camera.moveY(dez::input::getAxis(KEY_S, KEY_W) * CAM_SPEED);
+        camera.moveZ(dez::input::getAxis(KEY_Q, KEY_E) * CAM_SPEED);
 
         dor::gravity::tick(delta);
         dez::manager::tick(delta);
