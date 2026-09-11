@@ -2,7 +2,7 @@
 
 namespace DimOrbit::gravity {
 // == CONSTANTS ==
-const double G = 6.67430e-11; // N*(m^2)/(kg^2)
+const double G = 39.4784; // N*(m^2)/(kg^2)
 
 // == VARIABLES ==
 std::vector<DimOrbit::GravityBody*> bodyList;

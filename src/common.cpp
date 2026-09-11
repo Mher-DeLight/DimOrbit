@@ -12,8 +12,9 @@ void GravityBody::gravitate_Newtonian(GravityBody* other, float delta) {
     if (dist == 0.0f)
         return;
 
-    physics->core.applyAcceleration(
-        gravity::G * other->physics->core.mass * diff / (dist * dist * dist), delta);
+    const float accelerationScale =
+        static_cast<float>(gravity::G * other->physics->core.mass / (dist * dist * dist));
+    physics->core.applyAcceleration(diff * accelerationScale, delta);
 }
 GravityBody::GravityBody(uq<dez::PhysicsObject> physics_) : physics(std::move(physics_)) {
     gravity::registerBody(this);
