@@ -163,7 +163,8 @@ struct DrawObject {
     }
 
     ~DrawObject() {
-        UnloadModel(model);
+        if (IsWindowReady())
+            UnloadModel(model);
     }
 
     DrawObject(const DrawObject&) = delete;
