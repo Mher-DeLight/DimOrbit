@@ -33,7 +33,6 @@ CMakeSettings.json
 *.obj
 
 # Libraries
-*.a
 *.lib
 *.so
 *.so.*
