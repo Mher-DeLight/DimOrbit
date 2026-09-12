@@ -2,6 +2,7 @@
 #include <DimEngineZ/DimEngineZ.h>
 #include <memory>
 #include <optional>
+#include <unordered_map>
 
 namespace DimOrbit {
 namespace dez = DimEngineZ;
@@ -50,6 +51,7 @@ struct CelestialSystem {
 };
 struct Renderer {
     XZClue xzclue;
+    std::unordered_map<const GravityBody*, int> attributes;
 
     // XZ Clue
     bool isXZClueEnabled() const;

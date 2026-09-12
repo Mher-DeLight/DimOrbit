@@ -68,11 +68,31 @@ void Renderer::renderCS(const CelestialSystem& csystem, Camera& camera, Color bg
         }
     }
 
+    struct NameLabel {
+        std::string text;
+        Vector2 position;
+    };
+    std::vector<NameLabel> nameLabels;
+
     for (auto& body : csystem.bodies) {
         body->physics->core.shape.draw();
+
+        nameLabels.push_back({
+            body->name,
+            GetWorldToScreen(Vector3{body->physics->transform.position.x,
+                                     body->physics->collision.box.max.y,
+                                     body->physics->transform.position.z},
+                             camera),
+        });
     }
 
     EndMode3D();
+
+    constexpr Color nameColor = RED;
+    for (const auto& label : nameLabels) {
+        DrawText(label.text.c_str(), static_cast<int>(label.position.x),
+                 static_cast<int>(label.position.y), 20, nameColor);
+    }
 }
 bool Renderer::isXZClueEnabled() const {
     return xzclue.enabled;
