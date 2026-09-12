@@ -76,7 +76,8 @@ struct BasicSpacecraft {
     uq<GravityBody> body;
     dez::PhysicsObject* physics;
     double fuel = 100.0f;
-    double fuelElapseRate = 0.5f;
+    double fuelElapseRate = 1.0f;
+    dez::Vec3 thrust = dez::Vec3::ZERO;
 
     // Fuel
     void setFuel(float amount);
@@ -85,6 +86,7 @@ struct BasicSpacecraft {
 
     // Thrust
     void applyThrust(const dez::Vec3& amount);
+    void setThrust(const dez::Vec3& newthrust);
 
     // Constructors
     BasicSpacecraft(uq<GravityBody> body_) : body(std::move(body_)), physics(body->physics.get()) {}
@@ -103,6 +105,7 @@ struct BasicSpacecraft {
         physics = body->physics.get();
         fuel = options.fuel;
     }
+    void tick(float delta);
 };
 
 struct Renderer {

@@ -1,5 +1,4 @@
 #include <DimOrbit/DimOrbit.h>
-#include <cmath>
 #include <memory>
 
 int main(int, char**) {
@@ -11,10 +10,10 @@ int main(int, char**) {
     auto renderer = dor::Renderer();
     renderer.enableXZClue(true);
 
-    auto camera = dez::Camera({-10.0f, 0.0f, 0.0f}, dez::CameraOptions{
-                                                        .fovy = 90.0f,
-                                                        .direction = {1.0f, 0.0f, 0.0f},
-                                                    });
+    auto camera = dez::Camera({0.0f, 0.0f, -5.0f}, dez::CameraOptions{
+                                                       .fovy = 90.0f,
+                                                       .direction = {1.0f, 0.0f, 0.0f},
+                                                   });
     camera.setTarget(dez::Vec3{0.0f, 0.0f, 0.0f});
 
     auto sun = system.addBody(dor::BodyOptions{.name = "Sun",
@@ -34,29 +33,67 @@ int main(int, char**) {
 
     auto spacecraft =
         system.addSpacecraft(dor::BasicSpacecraftOptions{.name = "Explorer",
-                                                         .radius = 0.05f,
+                                                         .radius = 0.1f,
                                                          .color = BLUE,
                                                          .position = dez::Vec3{10.0f, 0.0f, 5.0f},
                                                          .velocity = dez::Vec3{-1.0f, 0.0f, -1.0f},
-                                                         .mass = 1e-23,
+                                                         .mass = 1e-12,
                                                          .collide = false});
     renderer.addAttribute(*spacecraft->body.get(), dor::RENATR_SHOW_NAME);
 
-    constexpr float CAM_SPEED = 5.0f;
-    constexpr float CAM_VERTICAL_SPEED = 50.0f;
-    constexpr float LOOK_SPEED = 1.8f;
+    constexpr float SPACECRAFT_SPEED = 1e-12f;
 
-    float cameraYaw = std::atan2(camera.direction.z, camera.direction.x);
-    float cameraPitch = std::asin(camera.direction.y / Vector3Length(camera.direction));
+    Vector3 cameraOffset = camera.position;
+    constexpr float CAMERA_LOOK_SPEED = 90.0f;
+    constexpr float CAMERA_MIN_PITCH = -89.0f;
+    constexpr float CAMERA_MAX_PITCH = 89.0f;
+    constexpr float CAMERA_DISTANCE = 5.0f;
 
-    float outerDelta = 0.0f;
+    float cameraYaw = 0.0f;
+    float cameraPitch = 0.0f;
+
     return dez::manager::fixedloop(
         60,
 
         // PHYSICS
         [&](float delta) {
-            outerDelta = delta;
+            // camera rotation
+
+            const float yawInput = dez::input::getAxis(KEY_LEFT, KEY_RIGHT);
+            const float pitchInput = dez::input::getAxis(KEY_DOWN, KEY_UP);
+
+            cameraYaw += yawInput * CAMERA_LOOK_SPEED * delta;
+            cameraPitch += pitchInput * CAMERA_LOOK_SPEED * delta;
+            cameraPitch = Clamp(cameraPitch, CAMERA_MIN_PITCH, CAMERA_MAX_PITCH);
+
+            const float yawRad = cameraYaw * DEG2RAD;
+            const float pitchRad = cameraPitch * DEG2RAD;
+
+            cameraOffset = Vector3{
+                CAMERA_DISTANCE * cosf(pitchRad) * sinf(yawRad),
+                CAMERA_DISTANCE * sinf(pitchRad),
+                -CAMERA_DISTANCE * cosf(pitchRad) * cosf(yawRad),
+            };
+
+            // spacecraft controls
+            Vector3 forward = Vector3Normalize(camera.direction);
+            Vector3 right = Vector3Normalize(Vector3CrossProduct(forward, camera.up));
+
+            Vector3 thrust = Vector3Add(Vector3Scale(forward, dez::input::getAxis(KEY_S, KEY_W)),
+                                        Vector3Scale(right, dez::input::getAxis(KEY_A, KEY_D)));
+
+            thrust = Vector3Add(
+                thrust, Vector3Scale(camera.up, dez::input::getAxis(KEY_LEFT_SHIFT, KEY_SPACE)));
+
+            spacecraft->setThrust(dez::Vec3{
+                thrust.x * SPACECRAFT_SPEED,
+                thrust.y * SPACECRAFT_SPEED,
+                thrust.z * SPACECRAFT_SPEED,
+            });
+
+            // physics
             system.tick(delta);
+            spacecraft->tick(delta);
 
             return true;
         },
@@ -64,30 +101,18 @@ int main(int, char**) {
         // RENDER
         [&]() {
             BeginDrawing();
-            cameraYaw += dez::input::getAxis(KEY_LEFT, KEY_RIGHT) * LOOK_SPEED * outerDelta;
-            cameraPitch += dez::input::getAxis(KEY_DOWN, KEY_UP) * LOOK_SPEED * outerDelta;
-            cameraPitch = Clamp(cameraPitch, -1.5707f, 1.5707f);
 
-            camera.direction = Vector3{
-                std::cos(cameraPitch) * std::cos(cameraYaw),
-                std::sin(cameraPitch),
-                std::cos(cameraPitch) * std::sin(cameraYaw),
-            };
-            camera.setTarget(camera.position + camera.direction);
+            Vector3 spacecraftPosition = spacecraft->body->physics->transform.position;
 
-            Vector3 forward =
-                Vector3Normalize(Vector3{camera.direction.x, 0.0f, camera.direction.z});
-            Vector3 right = Vector3Normalize(Vector3CrossProduct(forward, camera.up));
-            Vector3 movement = Vector3Add(Vector3Scale(forward, dez::input::getAxis(KEY_S, KEY_W)),
-                                          Vector3Scale(right, dez::input::getAxis(KEY_A, KEY_D)));
-            camera.move(
-                Vector3Scale(movement + Vector3{0.0f,
-                                                dez::input::getAxis(KEY_LEFT_SHIFT, KEY_SPACE) *
-                                                    CAM_VERTICAL_SPEED * outerDelta,
-                                                0.0f},
-                             CAM_SPEED * outerDelta));
+            camera.position = Vector3Add(spacecraftPosition, cameraOffset);
+
+            camera.direction =
+                Vector3Normalize(Vector3Subtract(spacecraftPosition, camera.position));
+
+            camera.setTarget(spacecraftPosition);
 
             renderer.renderCS(system, camera);
+
             EndDrawing();
 
             return true;

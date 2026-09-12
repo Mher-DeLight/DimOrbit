@@ -72,6 +72,11 @@ void Renderer::renderCS(const CelestialSystem& csystem, Camera& camera, Color bg
             DrawLine3D(Vector3{offset, GROUND_HEIGHT, -GROUND_EXTENT},
                        Vector3{offset, GROUND_HEIGHT, GROUND_EXTENT}, DARKGRAY);
         }
+
+        DrawLine3D(Vector3{-GROUND_EXTENT, GROUND_HEIGHT, 0.0f},
+                   Vector3{GROUND_EXTENT, GROUND_HEIGHT, 0.0f}, RED);
+        DrawLine3D(Vector3{0.0f, GROUND_HEIGHT, -GROUND_EXTENT},
+                   Vector3{0.0f, GROUND_HEIGHT, GROUND_EXTENT}, BLUE);
     }
 
     struct NameLabel {
@@ -137,6 +142,32 @@ void GravityBody::gravitate_Newtonian(GravityBody* other, float delta) {
 GravityBody::GravityBody(uq<dez::PhysicsObject> physics_, const std::string& name_)
     : physics(std::move(physics_)), name(name_) {
     gravity::registerBody(this);
+}
+
+// == BASIC SPACECRAFT ==
+void BasicSpacecraft::setFuel(float amount) {
+    fuel = amount;
+}
+void BasicSpacecraft::elapseFuel(float amount) {
+    fuel -= amount;
+}
+void BasicSpacecraft::refuel(float amount) {
+    fuel += amount;
+}
+
+void BasicSpacecraft::applyThrust(const dez::Vec3& amount) {
+    thrust += amount;
+}
+void BasicSpacecraft::setThrust(const dez::Vec3& amount) {
+    thrust = amount;
+}
+
+void BasicSpacecraft::tick(float delta) {
+    if (thrust.x == 0 && thrust.y == 0 && thrust.z == 0)
+        return; // if there is no thrust, movement will be handled by gravitate_Newtonian
+
+    physics->core.applyForce(thrust, delta);
+    elapseFuel(fuelElapseRate * delta);
 }
 
 } // namespace DimOrbit
