@@ -86,13 +86,13 @@ bool Renderer::enableXZClue(bool is_true) {
 // == GRAVITY BODY ==
 void GravityBody::gravitate_Newtonian(GravityBody* other, float delta) {
     dez::Vec3 diff = other->physics->transform.position - physics->transform.position;
-    float dist = diff.magnitude();
+    double dist = diff.magnitude();
 
     if (dist == 0.0f)
         return;
 
-    const float accelerationScale =
-        static_cast<float>(gravity::G * other->physics->core.mass / (dist * dist * dist));
+    const double accelerationScale =
+        static_cast<double>(gravity::G * other->physics->core.mass / (dist * dist * dist));
     physics->core.applyAcceleration(diff * accelerationScale, delta);
 }
 GravityBody::GravityBody(uq<dez::PhysicsObject> physics_, const std::string& name_)
