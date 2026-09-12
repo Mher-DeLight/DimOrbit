@@ -58,6 +58,9 @@ struct GravityBody {
 
     void gravitate_Newtonian(GravityBody* other, float delta);
 
+    // Utility
+    void beginOrbit(const GravityBody& other, double altitude, double inclination);
+
     GravityBody(uq<dez::PhysicsObject> physics_, const std::string& name_ = "");
 };
 struct CelestialSystem {
@@ -87,9 +90,6 @@ struct BasicSpacecraft {
     // Thrust
     void applyThrust(const dez::Vec3& amount);
     void setThrust(const dez::Vec3& newthrust);
-
-    // Utility
-    void beginOrbit(const GravityBody& other, double altitude, double inclination);
 
     // Constructors
     BasicSpacecraft(uq<GravityBody> body_) : body(std::move(body_)), physics(body->physics.get()) {}

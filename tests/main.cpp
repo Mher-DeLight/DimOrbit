@@ -14,8 +14,11 @@ int main(int, char**) {
     auto camera = dez::Camera({-5.0f, 5.0f, 5.0f});
     camera.setTarget({0.0f, 0.0f, 0.0f});
 
+    auto sun = system.addBody(
+        dor::BodyOptions{.name = "Sun", .radius = 5.0f, .color = YELLOW, .mass = 100.0f});
     auto earth = system.addBody(
         dor::BodyOptions{.name = "Earth", .radius = 1.0f, .color = GREEN, .mass = 1.0f});
+    earth->beginOrbit(*sun.get(), 3.0f, 0.0f);
     auto explorer = system.addSpacecraft(dor::BasicSpacecraftOptions{
         .name = "Explorer",
         .radius = 0.1f,
@@ -23,7 +26,7 @@ int main(int, char**) {
         .position = Vec3{5.0f, 0.0f, 0.0f},
         .mass = 1e-3,
     });
-    explorer->beginOrbit(*earth.get(), 1.0f, PI / 2);
+    explorer->body->beginOrbit(*earth.get(), 1.0f, 0.0f);
     renderer.addAttribute(*explorer->body.get(), dor::RENATR_SHOW_NAME);
 
     constexpr float CAM_SPEED = 5.0f;

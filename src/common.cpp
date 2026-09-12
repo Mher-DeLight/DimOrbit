@@ -141,6 +141,18 @@ void GravityBody::gravitate_Newtonian(GravityBody* other, float delta) {
         static_cast<double>(gravity::G * other->physics->core.mass / (dist * dist * dist));
     physics->core.applyAcceleration(diff * accelerationScale, delta);
 }
+void GravityBody::beginOrbit(const GravityBody& other, double altitude, double inclination) {
+    const auto& otherPhysics = other.physics->core;
+    const double orbitalRadius = static_cast<double>(other.physics->collision.radius) + altitude;
+    const double orbitalSpeed = std::sqrt(gravity::G * otherPhysics.mass / orbitalRadius);
+    const float radius = static_cast<float>(orbitalRadius);
+    const float angle = static_cast<float>(inclination);
+
+    physics->transform.position = otherPhysics.transform().position + dez::Vec3{radius, 0.0f, 0.0f};
+    physics->core.setVelocity(otherPhysics.velocity +
+                              dez::Vec3{0.0f, static_cast<float>(orbitalSpeed * std::sin(angle)),
+                                        static_cast<float>(orbitalSpeed * std::cos(angle))});
+}
 GravityBody::GravityBody(uq<dez::PhysicsObject> physics_, const std::string& name_)
     : physics(std::move(physics_)), name(name_) {
     gravity::registerBody(this);
@@ -162,19 +174,6 @@ void BasicSpacecraft::applyThrust(const dez::Vec3& amount) {
 }
 void BasicSpacecraft::setThrust(const dez::Vec3& amount) {
     thrust = amount;
-}
-
-void BasicSpacecraft::beginOrbit(const GravityBody& other, double altitude, double inclination) {
-    const auto& otherPhysics = other.physics->core;
-    const double orbitalRadius = static_cast<double>(other.physics->collision.radius) + altitude;
-    const double orbitalSpeed = std::sqrt(gravity::G * otherPhysics.mass / orbitalRadius);
-    const float radius = static_cast<float>(orbitalRadius);
-    const float angle = static_cast<float>(inclination);
-
-    physics->transform.position = otherPhysics.transform().position + dez::Vec3{radius, 0.0f, 0.0f};
-    physics->core.setVelocity(otherPhysics.velocity +
-                              dez::Vec3{0.0f, static_cast<float>(orbitalSpeed * std::sin(angle)),
-                                        static_cast<float>(orbitalSpeed * std::cos(angle))});
 }
 
 void BasicSpacecraft::tick(float delta) {
