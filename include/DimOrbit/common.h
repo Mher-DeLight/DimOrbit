@@ -3,10 +3,13 @@
 #include <memory>
 #include <optional>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace DimOrbit {
 namespace dez = DimEngineZ;
 template <typename T> using uq = std::unique_ptr<T>;
+
+inline constexpr int RENATR_SHOW_NAME = 1;
 
 struct BodyOptions {
     std::string name = "";
@@ -51,7 +54,12 @@ struct CelestialSystem {
 };
 struct Renderer {
     XZClue xzclue;
-    std::unordered_map<const GravityBody*, int> attributes;
+    std::unordered_map<const GravityBody*, std::unordered_set<int>> attributes;
+
+    // Attributes
+    void addAttribute(const GravityBody& object, int attribute);
+    void clearAttribtues(const GravityBody& object);
+    bool hasAttribute(const GravityBody& object, int attribute) const;
 
     // XZ Clue
     bool isXZClueEnabled() const;

@@ -77,13 +77,15 @@ void Renderer::renderCS(const CelestialSystem& csystem, Camera& camera, Color bg
     for (auto& body : csystem.bodies) {
         body->physics->core.shape.draw();
 
-        nameLabels.push_back({
-            body->name,
-            GetWorldToScreen(Vector3{body->physics->transform.position.x,
-                                     body->physics->collision.box.max.y,
-                                     body->physics->transform.position.z},
-                             camera),
-        });
+        if (hasAttribute(*body.get(), RENATR_SHOW_NAME)) {
+            nameLabels.push_back({
+                body->name,
+                GetWorldToScreen(Vector3{body->physics->transform.position.x,
+                                         body->physics->collision.box.max.y,
+                                         body->physics->transform.position.z},
+                                 camera),
+            });
+        }
     }
 
     EndMode3D();
@@ -101,6 +103,17 @@ bool Renderer::enableXZClue(bool is_true) {
     bool old = xzclue.enabled;
     xzclue.enabled = is_true;
     return old;
+}
+void Renderer::addAttribute(const GravityBody& object, int attribute) {
+    attributes[&object].insert(attribute);
+}
+void Renderer::clearAttribtues(const GravityBody& object) {
+    attributes[&object].clear();
+}
+bool Renderer::hasAttribute(const GravityBody& object, int attribute) const {
+    if (!attributes.contains(&object))
+        return false;
+    return attributes.at(&object).contains(attribute);
 }
 
 // == GRAVITY BODY ==

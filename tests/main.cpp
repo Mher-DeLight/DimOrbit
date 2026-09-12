@@ -23,6 +23,7 @@ int main(int, char**) {
                                 .velocity = dez::Vec3::UP,
                                 .mass = 2.0,
                                 .collide = false});
+    renderer.addAttribute(sun, dor::RENATR_SHOW_NAME);
     auto& earth = system.addBody(dor::BodyOptions{.name = "Earth",
                                                   .radius = 0.2f,
                                                   .color = GREEN,
@@ -30,6 +31,7 @@ int main(int, char**) {
                                                   .velocity = dez::Vec3{0.0f, 0.0f, 2.2f},
                                                   .mass = 6e-6,
                                                   .collide = false});
+    renderer.addAttribute(earth, dor::RENATR_SHOW_NAME);
 
     constexpr float CAM_SPEED = 5.0f;
     constexpr float CAM_VERTICAL_SPEED = 50.0f;
