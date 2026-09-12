@@ -38,10 +38,8 @@ struct GravityBody {
 struct CelestialSystem {
     std::vector<uq<GravityBody>> bodies;
     XZClue xzclue;
-    std::optional<std::reference_wrapper<Camera>> mainCamera;
 
     void tick(float delta);
-    void render(Color bgColor = BLACK);
 
     GravityBody& addBody(uq<GravityBody> body);
     GravityBody& addBody(uq<dez::PhysicsObject> physics);
@@ -51,11 +49,10 @@ struct CelestialSystem {
     bool isXZClueEnabled() const;
     bool enableXZClue(bool is_true = true); // returns the old state
 
-    // Camera
-    void setMainCamera(Camera& cam);
-    Camera& getMainCamera() const;
-
     CelestialSystem() = default;
+};
+struct Renderer {
+    void renderCS(const CelestialSystem& csystem, Camera& camera, Color bgColor = BLACK) const;
 };
 
 } // namespace DimOrbit

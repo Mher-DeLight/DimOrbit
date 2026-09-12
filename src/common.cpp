@@ -19,34 +19,6 @@ void CelestialSystem::tick(float delta) {
         dez::manager::tickObject(obj->physics.get(), delta);
     }
 }
-void CelestialSystem::render(Color bgColor) {
-    ClearBackground(bgColor);
-    if (!mainCamera.has_value()) {
-        throw std::runtime_error("DimOrbit: cannot render system without main camera");
-    }
-    BeginMode3D(getMainCamera());
-
-    if (isXZClueEnabled()) {
-        const float GROUND_SLICES = xzclue.slices;
-        const float GROUND_HEIGHT = xzclue.height;
-        const float GROUND_SPACING = xzclue.spacing;
-        const float GROUND_EXTENT = GROUND_SLICES * GROUND_SPACING * 0.5f;
-
-        for (int slice = 0; slice <= GROUND_SLICES; ++slice) {
-            const float offset = -GROUND_EXTENT + slice * GROUND_SPACING;
-            DrawLine3D(Vector3{-GROUND_EXTENT, GROUND_HEIGHT, offset},
-                       Vector3{GROUND_EXTENT, GROUND_HEIGHT, offset}, DARKGRAY);
-            DrawLine3D(Vector3{offset, GROUND_HEIGHT, -GROUND_EXTENT},
-                       Vector3{offset, GROUND_HEIGHT, GROUND_EXTENT}, DARKGRAY);
-        }
-    }
-
-    for (auto& body : bodies) {
-        body->physics->core.shape.draw();
-    }
-
-    EndMode3D();
-}
 
 bool CelestialSystem::isXZClueEnabled() const {
     return xzclue.enabled;
@@ -55,17 +27,6 @@ bool CelestialSystem::enableXZClue(bool is_true) {
     bool old = xzclue.enabled;
     xzclue.enabled = is_true;
     return old;
-}
-
-void CelestialSystem::setMainCamera(Camera& cam) {
-    mainCamera = cam;
-}
-Camera& CelestialSystem::getMainCamera() const {
-    if (!mainCamera.has_value()) {
-        throw std::runtime_error("DimOrbit: cannot get main camera, it is empty");
-    }
-
-    return mainCamera.value().get();
 }
 
 GravityBody& CelestialSystem::addBody(uq<GravityBody> body) {
@@ -93,6 +54,33 @@ GravityBody& CelestialSystem::addBody(const BodyOptions& options) {
     bodies.push_back(std::move(body));
     return *bodies.back();
     // clang-format on
+}
+
+// == RENDERER ==
+void Renderer::renderCS(const CelestialSystem& csystem, Camera& camera, Color bgColor) const {
+    ClearBackground(bgColor);
+    BeginMode3D(camera);
+
+    if (csystem.isXZClueEnabled()) {
+        const float GROUND_SLICES = csystem.xzclue.slices;
+        const float GROUND_HEIGHT = csystem.xzclue.height;
+        const float GROUND_SPACING = csystem.xzclue.spacing;
+        const float GROUND_EXTENT = GROUND_SLICES * GROUND_SPACING * 0.5f;
+
+        for (int slice = 0; slice <= GROUND_SLICES; ++slice) {
+            const float offset = -GROUND_EXTENT + slice * GROUND_SPACING;
+            DrawLine3D(Vector3{-GROUND_EXTENT, GROUND_HEIGHT, offset},
+                       Vector3{GROUND_EXTENT, GROUND_HEIGHT, offset}, DARKGRAY);
+            DrawLine3D(Vector3{offset, GROUND_HEIGHT, -GROUND_EXTENT},
+                       Vector3{offset, GROUND_HEIGHT, GROUND_EXTENT}, DARKGRAY);
+        }
+    }
+
+    for (auto& body : csystem.bodies) {
+        body->physics->core.shape.draw();
+    }
+
+    EndMode3D();
 }
 
 // == GRAVITY BODY ==

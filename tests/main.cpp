@@ -7,15 +7,15 @@ int main(int, char**) {
     namespace dor = DimOrbit;
     dez::manager::init(1000, 800, "Gravity Simulation");
 
+    auto system = dor::CelestialSystem();
+    system.enableXZClue(true);
+    auto renderer = dor::Renderer();
+
     auto camera = dez::Camera({-10.0f, 0.0f, 0.0f}, dez::CameraOptions{
                                                         .fovy = 90.0f,
                                                         .direction = {1.0f, 0.0f, 0.0f},
                                                     });
     camera.setTarget(dez::Vec3{0.0f, 0.0f, 0.0f});
-
-    auto system = dor::CelestialSystem();
-    system.enableXZClue(true);
-    system.setMainCamera(camera);
 
     auto& sun = system.addBody({.radius = 1.0f, .color = YELLOW, .mass = 2.0, .collide = false});
     auto& earth = system.addBody(dor::BodyOptions{.radius = 0.2f,
@@ -70,11 +70,7 @@ int main(int, char**) {
                                                 0.0f},
                              CAM_SPEED * outerDelta));
 
-            system.render();
-            BeginMode3D(camera);
-
-            EndMode3D();
-
+            renderer.renderCS(system, camera);
             EndDrawing();
 
             return true;
