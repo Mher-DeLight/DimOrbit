@@ -10,6 +10,7 @@ int main(int, char**) {
     auto camera = dez::Camera({-10.0f, 0.0f, 0.0f},
                               dez::CameraOptions{
                                   .fovy = 90.0f,
+                                  .direction = {1.0f, 0.0f, 0.0f},
                               },
                               MAIN_CAMERA);
     camera.setTarget(dez::Vec3{0.0f, 0.0f, 0.0f});
@@ -43,57 +44,68 @@ int main(int, char**) {
     constexpr float CAM_SPEED = 5.0f;
     constexpr float CAM_VERTICAL_SPEED = 50.0f;
     constexpr float LOOK_SPEED = 1.8f;
-    constexpr int SPEED_SCALE = 1;
 
     float cameraYaw = std::atan2(camera.direction.z, camera.direction.x);
     float cameraPitch = std::asin(camera.direction.y / Vector3Length(camera.direction));
-    return dez::manager::main(60, [&](float delta) {
-        if (dez::input::isKeyPressed(KEY_ESCAPE)) {
-            exit(0);
-        }
 
-        cameraYaw += dez::input::getAxis(KEY_LEFT, KEY_RIGHT) * LOOK_SPEED * delta;
-        cameraPitch += dez::input::getAxis(KEY_DOWN, KEY_UP) * LOOK_SPEED * delta;
-        cameraPitch = Clamp(cameraPitch, -1.5707f, 1.5707f);
+    float outerDelta = 0.0f;
+    return dez::manager::fixedloop(
+        60,
 
-        camera.direction = Vector3{
-            std::cos(cameraPitch) * std::cos(cameraYaw),
-            std::sin(cameraPitch),
-            std::cos(cameraPitch) * std::sin(cameraYaw),
-        };
-        camera.setTarget(camera.position + camera.direction);
-
-        Vector3 forward = Vector3Normalize(Vector3{camera.direction.x, 0.0f, camera.direction.z});
-        Vector3 right = Vector3Normalize(Vector3CrossProduct(forward, camera.up));
-        Vector3 movement = Vector3Add(Vector3Scale(forward, dez::input::getAxis(KEY_S, KEY_W)),
-                                      Vector3Scale(right, dez::input::getAxis(KEY_A, KEY_D)));
-        camera.move(Vector3Scale(movement + Vector3{0.0f,
-                                                    dez::input::getAxis(KEY_LEFT_SHIFT, KEY_SPACE) *
-                                                        CAM_VERTICAL_SPEED * delta,
-                                                    0.0f},
-                                 CAM_SPEED * delta));
-
-        const float simulationDelta = delta / SPEED_SCALE;
-        for (int i = 0; i < SPEED_SCALE; i++) {
+        // PHYSICS
+        [&](float delta) {
+            outerDelta = delta;
+            if (dez::input::isKeyPressed(KEY_ESCAPE)) {
+                exit(0);
+            }
             system.tick(delta);
-        }
 
-        ClearBackground(BLACK);
-        BeginMode3D(camera);
-        sunBody.physics->core.shape.draw();
-        earthBody.physics->core.shape.draw();
-        for (int slice = 0; slice <= GROUND_SLICES; ++slice) {
-            const float offset = -GROUND_EXTENT + slice * GROUND_SPACING;
-            DrawLine3D(Vector3{-GROUND_EXTENT, GROUND_HEIGHT, offset},
-                       Vector3{GROUND_EXTENT, GROUND_HEIGHT, offset}, DARKGRAY);
-            DrawLine3D(Vector3{offset, GROUND_HEIGHT, -GROUND_EXTENT},
-                       Vector3{offset, GROUND_HEIGHT, GROUND_EXTENT}, DARKGRAY);
-        }
-        EndMode3D();
+            dez::logger::flushLog("x: " + std::to_string(camera.position.x) +
+                                  " y: " + std::to_string(camera.position.y) +
+                                  " z: " + std::to_string(camera.position.z));
 
-        dez::logger::flushLog("x: " + std::to_string(camera.position.x) +
-                              " y: " + std::to_string(camera.position.y) +
-                              " z: " + std::to_string(camera.position.z));
-        return true;
-    });
+            return true;
+        },
+
+        // RENDER
+        [&]() {
+            BeginDrawing();
+            cameraYaw += dez::input::getAxis(KEY_LEFT, KEY_RIGHT) * LOOK_SPEED * outerDelta;
+            cameraPitch += dez::input::getAxis(KEY_DOWN, KEY_UP) * LOOK_SPEED * outerDelta;
+            cameraPitch = Clamp(cameraPitch, -1.5707f, 1.5707f);
+
+            camera.direction = Vector3{
+                std::cos(cameraPitch) * std::cos(cameraYaw),
+                std::sin(cameraPitch),
+                std::cos(cameraPitch) * std::sin(cameraYaw),
+            };
+            camera.setTarget(camera.position + camera.direction);
+
+            Vector3 forward =
+                Vector3Normalize(Vector3{camera.direction.x, 0.0f, camera.direction.z});
+            Vector3 right = Vector3Normalize(Vector3CrossProduct(forward, camera.up));
+            Vector3 movement = Vector3Add(Vector3Scale(forward, dez::input::getAxis(KEY_S, KEY_W)),
+                                          Vector3Scale(right, dez::input::getAxis(KEY_A, KEY_D)));
+            camera.move(
+                Vector3Scale(movement + Vector3{0.0f,
+                                                dez::input::getAxis(KEY_LEFT_SHIFT, KEY_SPACE) *
+                                                    CAM_VERTICAL_SPEED * outerDelta,
+                                                0.0f},
+                             CAM_SPEED * outerDelta));
+
+            ClearBackground(BLACK);
+            BeginMode3D(camera);
+            sunBody.physics->core.shape.draw();
+            earthBody.physics->core.shape.draw();
+            for (int slice = 0; slice <= GROUND_SLICES; ++slice) {
+                const float offset = -GROUND_EXTENT + slice * GROUND_SPACING;
+                DrawLine3D(Vector3{-GROUND_EXTENT, GROUND_HEIGHT, offset},
+                           Vector3{GROUND_EXTENT, GROUND_HEIGHT, offset}, DARKGRAY);
+                DrawLine3D(Vector3{offset, GROUND_HEIGHT, -GROUND_EXTENT},
+                           Vector3{offset, GROUND_HEIGHT, GROUND_EXTENT}, DARKGRAY);
+            }
+            EndMode3D();
+            EndDrawing();
+            return true;
+        });
 }

@@ -19,15 +19,6 @@ void CelestialSystem::tick(float delta) {
         dez::manager::tickObject(obj->physics.get(), delta);
     }
 
-    ClearBackground(RAYWHITE);
-    if (!dez::manager::mainCamera.has_value()) {
-        throw std::runtime_error("DimOrbit: invalid render cycle; no main camera assigned");
-    }
-    BeginMode3D(dez::manager::mainCamera->get());
-    for (auto& obj : bodies) {
-        dez::manager::drawObject(obj->physics.get());
-    }
-    EndMode3D();
 }
 GravityBody& CelestialSystem::addBody(uq<GravityBody> body) {
     bodies.push_back(std::move(body));
