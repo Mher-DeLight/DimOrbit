@@ -33,8 +33,9 @@ GravityBody& CelestialSystem::addBody(uq<GravityBody> body) {
     bodies.push_back(std::move(body));
     return *bodies.back();
 }
-GravityBody& CelestialSystem::addBody(uq<dez::PhysicsObject> body) {
+GravityBody& CelestialSystem::addBody(uq<dez::PhysicsObject> body, const std::string& name) {
     bodies.push_back(std::make_unique<GravityBody>(std::move(body)));
+    bodies.back()->name = name;
     return *bodies.back();
 }
 GravityBody& CelestialSystem::addBody(const BodyOptions& options) {
@@ -46,7 +47,7 @@ GravityBody& CelestialSystem::addBody(const BodyOptions& options) {
             options.color
         ),
         options.bounce
-        ));
+        ), options.name);
     body->physics->enableCollisions(options.collide);
     body->physics->enableStatic(options.isStatic);
     body->physics->core.applyVelocity(options.velocity);
@@ -95,7 +96,8 @@ void GravityBody::gravitate_Newtonian(GravityBody* other, float delta) {
         static_cast<float>(gravity::G * other->physics->core.mass / (dist * dist * dist));
     physics->core.applyAcceleration(diff * accelerationScale, delta);
 }
-GravityBody::GravityBody(uq<dez::PhysicsObject> physics_) : physics(std::move(physics_)) {
+GravityBody::GravityBody(uq<dez::PhysicsObject> physics_, const std::string& name_)
+    : physics(std::move(physics_)), name(name_) {
     gravity::registerBody(this);
 }
 

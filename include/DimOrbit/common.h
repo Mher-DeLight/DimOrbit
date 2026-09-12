@@ -8,6 +8,7 @@ namespace dez = DimEngineZ;
 template <typename T> using uq = std::unique_ptr<T>;
 
 struct BodyOptions {
+    std::string name = "";
     float radius = 1.0f;
     Color color = RED;
     float bounce = 1.0f;
@@ -30,10 +31,11 @@ struct XZClue {
 
 struct GravityBody {
     uq<dez::PhysicsObject> physics;
+    std::string name = "";
 
     void gravitate_Newtonian(GravityBody* other, float delta);
 
-    GravityBody(uq<dez::PhysicsObject> physics_);
+    GravityBody(uq<dez::PhysicsObject> physics_, const std::string& name_ = "");
 };
 struct CelestialSystem {
     std::vector<uq<GravityBody>> bodies;
@@ -42,7 +44,7 @@ struct CelestialSystem {
     void tick(float delta);
 
     GravityBody& addBody(uq<GravityBody> body);
-    GravityBody& addBody(uq<dez::PhysicsObject> physics);
+    GravityBody& addBody(uq<dez::PhysicsObject> physics, const std::string& name = "");
     GravityBody& addBody(const BodyOptions& options);
 
     // XZ Clue
