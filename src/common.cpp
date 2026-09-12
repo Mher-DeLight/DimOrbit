@@ -18,8 +18,56 @@ void CelestialSystem::tick(float delta) {
     for (auto& obj : bodies) {
         dez::manager::tickObject(obj->physics.get(), delta);
     }
-
 }
+void CelestialSystem::render(Color bgColor) {
+    ClearBackground(bgColor);
+    if (!mainCamera.has_value()) {
+        throw std::runtime_error("DimOrbit: cannot render system without main camera");
+    }
+    BeginMode3D(getMainCamera());
+
+    if (isXZClueEnabled()) {
+        const float GROUND_SLICES = xzclue.slices;
+        const float GROUND_HEIGHT = xzclue.height;
+        const float GROUND_SPACING = xzclue.spacing;
+        const float GROUND_EXTENT = GROUND_SLICES * GROUND_SPACING * 0.5f;
+
+        for (int slice = 0; slice <= GROUND_SLICES; ++slice) {
+            const float offset = -GROUND_EXTENT + slice * GROUND_SPACING;
+            DrawLine3D(Vector3{-GROUND_EXTENT, GROUND_HEIGHT, offset},
+                       Vector3{GROUND_EXTENT, GROUND_HEIGHT, offset}, DARKGRAY);
+            DrawLine3D(Vector3{offset, GROUND_HEIGHT, -GROUND_EXTENT},
+                       Vector3{offset, GROUND_HEIGHT, GROUND_EXTENT}, DARKGRAY);
+        }
+    }
+
+    for (auto& body : bodies) {
+        body->physics->core.shape.draw();
+    }
+
+    EndMode3D();
+}
+
+bool CelestialSystem::isXZClueEnabled() const {
+    return xzclue.enabled;
+}
+bool CelestialSystem::enableXZClue(bool is_true) {
+    bool old = xzclue.enabled;
+    xzclue.enabled = is_true;
+    return old;
+}
+
+void CelestialSystem::setMainCamera(Camera& cam) {
+    mainCamera = cam;
+}
+Camera& CelestialSystem::getMainCamera() const {
+    if (!mainCamera.has_value()) {
+        throw std::runtime_error("DimOrbit: cannot get main camera, it is empty");
+    }
+
+    return mainCamera.value().get();
+}
+
 GravityBody& CelestialSystem::addBody(uq<GravityBody> body) {
     bodies.push_back(std::move(body));
     return *bodies.back();
@@ -27,6 +75,24 @@ GravityBody& CelestialSystem::addBody(uq<GravityBody> body) {
 GravityBody& CelestialSystem::addBody(uq<dez::PhysicsObject> body) {
     bodies.push_back(std::make_unique<GravityBody>(std::move(body)));
     return *bodies.back();
+}
+GravityBody& CelestialSystem::addBody(const BodyOptions& options) {
+    // clang-format off
+    auto body = std::make_unique<GravityBody>(std::make_unique<dez::PhysicsObject>(
+        dez::DrawObject(
+            GenMeshSphere(options.radius, options.rings, options.slices),
+            dez::Transform(options.position, options.rotation, options.scale),
+            options.color
+        ),
+        options.bounce
+        ));
+    body->physics->enableCollisions(options.collide);
+    body->physics->enableStatic(options.isStatic);
+    body->physics->core.applyVelocity(options.velocity);
+    body->physics->core.mass = options.mass;
+    bodies.push_back(std::move(body));
+    return *bodies.back();
+    // clang-format on
 }
 
 // == GRAVITY BODY ==

@@ -7,39 +7,23 @@ int main(int, char**) {
     namespace dor = DimOrbit;
     dez::manager::init(1000, 800, "Gravity Simulation");
 
-    auto camera = dez::Camera({-10.0f, 0.0f, 0.0f},
-                              dez::CameraOptions{
-                                  .fovy = 90.0f,
-                                  .direction = {1.0f, 0.0f, 0.0f},
-                              },
-                              MAIN_CAMERA);
+    auto camera = dez::Camera({-10.0f, 0.0f, 0.0f}, dez::CameraOptions{
+                                                        .fovy = 90.0f,
+                                                        .direction = {1.0f, 0.0f, 0.0f},
+                                                    });
     camera.setTarget(dez::Vec3{0.0f, 0.0f, 0.0f});
 
-    constexpr float GROUND_HEIGHT = -1.25f;
-    constexpr int GROUND_SLICES = 40;
-    constexpr float GROUND_SPACING = 1.0f;
-    constexpr float GROUND_EXTENT = GROUND_SLICES * GROUND_SPACING * 0.5f;
-
     auto system = dor::CelestialSystem();
+    system.enableXZClue(true);
+    system.setMainCamera(camera);
 
-    auto mesh = GenMeshSphere(1.0f, 32, 32);
-    auto drawobj = dez::DrawObject(std::move(mesh), dez::Transform(), YELLOW);
-    auto physicsObject = std::make_unique<dez::PhysicsObject>(std::move(drawobj));
-    auto sun = std::make_unique<dor::GravityBody>(std::move(physicsObject));
-    sun->physics->core.shape.transform.goTo(Vector3{0.0f, 0.0f, 0.0f});
-    sun->physics->core.mass = 2;
-    sun->physics->enableCollisions(false);
-    auto& sunBody = system.addBody(std::move(sun));
-
-    mesh = GenMeshSphere(0.2f, 32, 32);
-    drawobj = dez::DrawObject(std::move(mesh), dez::Transform(), GREEN);
-    physicsObject = std::make_unique<dez::PhysicsObject>(std::move(drawobj));
-    auto earth = std::make_unique<dor::GravityBody>(std::move(physicsObject));
-    earth->physics->transform.goTo(dez::Vec3{-8.0f, 0.0f, 0.0f});
-    earth->physics->core.mass = 6e-6;
-    earth->physics->enableCollisions(false);
-    earth->physics->core.applyVelocity(dez::Vec3{0.0f, 0.0f, 2.2f});
-    auto& earthBody = system.addBody(std::move(earth));
+    auto& sun = system.addBody({.radius = 1.0f, .color = YELLOW, .mass = 2.0, .collide = false});
+    auto& earth = system.addBody(dor::BodyOptions{.radius = 0.2f,
+                                                  .color = GREEN,
+                                                  .position = dez::Vec3{-8.0f, 0.0f, 0.0f},
+                                                  .velocity = dez::Vec3{0.0f, 0.0f, 2.2f},
+                                                  .mass = 6e-6,
+                                                  .collide = false});
 
     constexpr float CAM_SPEED = 5.0f;
     constexpr float CAM_VERTICAL_SPEED = 50.0f;
@@ -86,19 +70,13 @@ int main(int, char**) {
                                                 0.0f},
                              CAM_SPEED * outerDelta));
 
-            ClearBackground(BLACK);
+            system.render();
             BeginMode3D(camera);
-            sunBody.physics->core.shape.draw();
-            earthBody.physics->core.shape.draw();
-            for (int slice = 0; slice <= GROUND_SLICES; ++slice) {
-                const float offset = -GROUND_EXTENT + slice * GROUND_SPACING;
-                DrawLine3D(Vector3{-GROUND_EXTENT, GROUND_HEIGHT, offset},
-                           Vector3{GROUND_EXTENT, GROUND_HEIGHT, offset}, DARKGRAY);
-                DrawLine3D(Vector3{offset, GROUND_HEIGHT, -GROUND_EXTENT},
-                           Vector3{offset, GROUND_HEIGHT, GROUND_EXTENT}, DARKGRAY);
-            }
+
             EndMode3D();
+
             EndDrawing();
+
             return true;
         });
 }
