@@ -21,9 +21,9 @@ int main(int, char**) {
         .radius = 0.1f,
         .color = WHITE,
         .position = Vec3{5.0f, 0.0f, 0.0f},
-        .velocity = Vec3{-1.0f, 0.0f, 2.1f},
         .mass = 1e-3,
     });
+    explorer->beginOrbit(*earth.get(), 1.0f, 0.0);
     renderer.addAttribute(*explorer->body.get(), dor::RENATR_SHOW_NAME);
 
     constexpr float CAM_SPEED = 5.0f;

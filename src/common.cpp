@@ -1,5 +1,6 @@
 #include "../include/DimOrbit/common.h"
 #include "../include/DimOrbit/gravity.h"
+#include <cmath>
 #include <iostream>
 
 namespace DimOrbit {
@@ -91,10 +92,11 @@ void Renderer::renderCS(const CelestialSystem& csystem, Camera& camera, Color bg
         if (hasAttribute(*body, RENATR_SHOW_NAME)) {
             nameLabels.push_back({
                 body->name,
-                GetWorldToScreen(Vector3{body->physics->transform.position.x,
-                                         body->physics->collision.box.max.y,
-                                         body->physics->transform.position.z},
-                                 camera),
+                GetWorldToScreen(
+                    Vector3{body->physics->transform.position.x,
+                            body->physics->collision.center.y + body->physics->collision.radius,
+                            body->physics->transform.position.z},
+                    camera),
             });
         }
     }
@@ -160,6 +162,19 @@ void BasicSpacecraft::applyThrust(const dez::Vec3& amount) {
 }
 void BasicSpacecraft::setThrust(const dez::Vec3& amount) {
     thrust = amount;
+}
+
+void BasicSpacecraft::beginOrbit(const GravityBody& other, double altitude, double inclination) {
+    // todo: fix orbit falls immediately
+    const auto& otherPhysics = other.physics->core;
+    const double orbitalSpeed = std::sqrt(gravity::G * otherPhysics.mass / altitude);
+    const float radius = static_cast<float>(altitude);
+    const float angle = static_cast<float>(inclination);
+
+    physics->transform.position = otherPhysics.transform().position + dez::Vec3{radius, 0.0f, 0.0f};
+    physics->core.setVelocity(otherPhysics.velocity +
+                              dez::Vec3{0.0f, static_cast<float>(orbitalSpeed * std::sin(angle)),
+                                        static_cast<float>(orbitalSpeed * std::cos(angle))});
 }
 
 void BasicSpacecraft::tick(float delta) {

@@ -88,6 +88,9 @@ struct BasicSpacecraft {
     void applyThrust(const dez::Vec3& amount);
     void setThrust(const dez::Vec3& newthrust);
 
+    // Utility
+    void beginOrbit(const GravityBody& other, double altitude, double inclination);
+
     // Constructors
     BasicSpacecraft(uq<GravityBody> body_) : body(std::move(body_)), physics(body->physics.get()) {}
     BasicSpacecraft(const BasicSpacecraftOptions& options) {

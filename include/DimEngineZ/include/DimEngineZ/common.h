@@ -219,13 +219,17 @@ struct MovementObject {
     void applyForce(const Vec3& force, float delta);
 };
 struct CollisionBox {
-    BoundingBox box;
+    Vector3 center;
+    float radius;
     void update(const Transform& transform);
 
     bool colliding_with(const CollisionBox& other) const;
 
-    explicit CollisionBox(const BoundingBox& box_) : box(box_) {}
-    explicit CollisionBox(const Model& model) : box(GetModelBoundingBox(model)) {}
+    explicit CollisionBox(const BoundingBox& box_)
+        : center{(box_.min.x + box_.max.x) * 0.5f, (box_.min.y + box_.max.y) * 0.5f,
+                 (box_.min.z + box_.max.z) * 0.5f},
+          radius{Vector3Length(Vector3Subtract(box_.max, center))} {}
+    explicit CollisionBox(const Model& model) : CollisionBox(GetModelBoundingBox(model)) {}
 };
 struct PhysicsObject {
     CollisionBox collision;
