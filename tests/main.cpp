@@ -55,14 +55,7 @@ int main(int, char**) {
         // PHYSICS
         [&](float delta) {
             outerDelta = delta;
-            if (dez::input::isKeyPressed(KEY_ESCAPE)) {
-                exit(0);
-            }
             system.tick(delta);
-
-            dez::logger::flushLog("x: " + std::to_string(camera.position.x) +
-                                  " y: " + std::to_string(camera.position.y) +
-                                  " z: " + std::to_string(camera.position.z));
 
             return true;
         },
