@@ -8,8 +8,8 @@ int main(int, char**) {
     dez::manager::init(1000, 800, "Gravity Simulation");
 
     auto system = dor::CelestialSystem();
-    system.enableXZClue(true);
     auto renderer = dor::Renderer();
+    renderer.enableXZClue(true);
 
     auto camera = dez::Camera({-10.0f, 0.0f, 0.0f}, dez::CameraOptions{
                                                         .fovy = 90.0f,

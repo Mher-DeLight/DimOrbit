@@ -39,7 +39,6 @@ struct GravityBody {
 };
 struct CelestialSystem {
     std::vector<uq<GravityBody>> bodies;
-    XZClue xzclue;
 
     void tick(float delta);
 
@@ -47,13 +46,16 @@ struct CelestialSystem {
     GravityBody& addBody(uq<dez::PhysicsObject> physics, const std::string& name = "");
     GravityBody& addBody(const BodyOptions& options);
 
+    CelestialSystem() = default;
+};
+struct Renderer {
+    XZClue xzclue;
+
     // XZ Clue
     bool isXZClueEnabled() const;
     bool enableXZClue(bool is_true = true); // returns the old state
 
-    CelestialSystem() = default;
-};
-struct Renderer {
+    // Render Methods
     void renderCS(const CelestialSystem& csystem, Camera& camera, Color bgColor = BLACK) const;
 };
 

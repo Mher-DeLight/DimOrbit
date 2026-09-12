@@ -20,15 +20,6 @@ void CelestialSystem::tick(float delta) {
     }
 }
 
-bool CelestialSystem::isXZClueEnabled() const {
-    return xzclue.enabled;
-}
-bool CelestialSystem::enableXZClue(bool is_true) {
-    bool old = xzclue.enabled;
-    xzclue.enabled = is_true;
-    return old;
-}
-
 GravityBody& CelestialSystem::addBody(uq<GravityBody> body) {
     bodies.push_back(std::move(body));
     return *bodies.back();
@@ -62,10 +53,10 @@ void Renderer::renderCS(const CelestialSystem& csystem, Camera& camera, Color bg
     ClearBackground(bgColor);
     BeginMode3D(camera);
 
-    if (csystem.isXZClueEnabled()) {
-        const float GROUND_SLICES = csystem.xzclue.slices;
-        const float GROUND_HEIGHT = csystem.xzclue.height;
-        const float GROUND_SPACING = csystem.xzclue.spacing;
+    if (isXZClueEnabled()) {
+        const float GROUND_SLICES = xzclue.slices;
+        const float GROUND_HEIGHT = xzclue.height;
+        const float GROUND_SPACING = xzclue.spacing;
         const float GROUND_EXTENT = GROUND_SLICES * GROUND_SPACING * 0.5f;
 
         for (int slice = 0; slice <= GROUND_SLICES; ++slice) {
@@ -82,6 +73,14 @@ void Renderer::renderCS(const CelestialSystem& csystem, Camera& camera, Color bg
     }
 
     EndMode3D();
+}
+bool Renderer::isXZClueEnabled() const {
+    return xzclue.enabled;
+}
+bool Renderer::enableXZClue(bool is_true) {
+    bool old = xzclue.enabled;
+    xzclue.enabled = is_true;
+    return old;
 }
 
 // == GRAVITY BODY ==
