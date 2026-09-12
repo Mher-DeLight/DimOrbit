@@ -19,22 +19,26 @@ int main(int, char**) {
     constexpr float GROUND_SPACING = 1.0f;
     constexpr float GROUND_EXTENT = GROUND_SLICES * GROUND_SPACING * 0.5f;
 
+    auto system = dor::CelestialSystem();
+
     auto mesh = GenMeshSphere(1.0f, 32, 32);
     auto drawobj = dez::DrawObject(std::move(mesh), dez::Transform(), YELLOW);
     auto physicsObject = std::make_unique<dez::PhysicsObject>(std::move(drawobj));
-    auto sun = dor::GravityBody(std::move(physicsObject));
-    sun.physics->core.shape.transform.goTo(Vector3{0.0f, 0.0f, 0.0f});
-    sun.physics->core.mass = 2;
-    sun.physics->enableCollisions(false);
+    auto sun = std::make_unique<dor::GravityBody>(std::move(physicsObject));
+    sun->physics->core.shape.transform.goTo(Vector3{0.0f, 0.0f, 0.0f});
+    sun->physics->core.mass = 2;
+    sun->physics->enableCollisions(false);
+    auto& sunBody = system.addBody(std::move(sun));
 
     mesh = GenMeshSphere(0.2f, 32, 32);
     drawobj = dez::DrawObject(std::move(mesh), dez::Transform(), GREEN);
     physicsObject = std::make_unique<dez::PhysicsObject>(std::move(drawobj));
-    auto earth = dor::GravityBody(std::move(physicsObject));
-    earth.physics->transform.goTo(dez::Vec3{-8.0f, 0.0f, 0.0f});
-    earth.physics->core.mass = 6e-6;
-    earth.physics->enableCollisions(false);
-    earth.physics->core.applyVelocity(dez::Vec3{0.0f, 0.0f, 2.2f});
+    auto earth = std::make_unique<dor::GravityBody>(std::move(physicsObject));
+    earth->physics->transform.goTo(dez::Vec3{-8.0f, 0.0f, 0.0f});
+    earth->physics->core.mass = 6e-6;
+    earth->physics->enableCollisions(false);
+    earth->physics->core.applyVelocity(dez::Vec3{0.0f, 0.0f, 2.2f});
+    auto& earthBody = system.addBody(std::move(earth));
 
     constexpr float CAM_SPEED = 5.0f;
     constexpr float CAM_VERTICAL_SPEED = 50.0f;
@@ -71,14 +75,13 @@ int main(int, char**) {
 
         const float simulationDelta = delta / SPEED_SCALE;
         for (int i = 0; i < SPEED_SCALE; i++) {
-            dor::gravity::tick(simulationDelta);
-            dez::manager::tick(simulationDelta);
+            system.tick(delta);
         }
 
         ClearBackground(BLACK);
         BeginMode3D(camera);
-        sun.physics->core.shape.draw();
-        earth.physics->core.shape.draw();
+        sunBody.physics->core.shape.draw();
+        earthBody.physics->core.shape.draw();
         for (int slice = 0; slice <= GROUND_SLICES; ++slice) {
             const float offset = -GROUND_EXTENT + slice * GROUND_SPACING;
             DrawLine3D(Vector3{-GROUND_EXTENT, GROUND_HEIGHT, offset},

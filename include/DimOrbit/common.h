@@ -13,5 +13,14 @@ struct GravityBody {
 
     GravityBody(uq<dez::PhysicsObject> physics_);
 };
+struct CelestialSystem {
+    std::vector<uq<GravityBody>> bodies;
+
+    void tick(float delta);
+    GravityBody& addBody(uq<GravityBody> body);
+    GravityBody& addBody(uq<dez::PhysicsObject> physics);
+
+    CelestialSystem() = default;
+};
 
 } // namespace DimOrbit
