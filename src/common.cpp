@@ -165,10 +165,10 @@ void BasicSpacecraft::setThrust(const dez::Vec3& amount) {
 }
 
 void BasicSpacecraft::beginOrbit(const GravityBody& other, double altitude, double inclination) {
-    // todo: fix orbit falls immediately
     const auto& otherPhysics = other.physics->core;
-    const double orbitalSpeed = std::sqrt(gravity::G * otherPhysics.mass / altitude);
-    const float radius = static_cast<float>(altitude);
+    const double orbitalRadius = static_cast<double>(other.physics->collision.radius) + altitude;
+    const double orbitalSpeed = std::sqrt(gravity::G * otherPhysics.mass / orbitalRadius);
+    const float radius = static_cast<float>(orbitalRadius);
     const float angle = static_cast<float>(inclination);
 
     physics->transform.position = otherPhysics.transform().position + dez::Vec3{radius, 0.0f, 0.0f};

@@ -23,7 +23,7 @@ int main(int, char**) {
         .position = Vec3{5.0f, 0.0f, 0.0f},
         .mass = 1e-3,
     });
-    explorer->beginOrbit(*earth.get(), 1.0f, 0.0);
+    explorer->beginOrbit(*earth.get(), 1.0f, PI / 2);
     renderer.addAttribute(*explorer->body.get(), dor::RENATR_SHOW_NAME);
 
     constexpr float CAM_SPEED = 5.0f;
