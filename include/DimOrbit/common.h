@@ -11,6 +11,8 @@ template <typename T> using uq = std::unique_ptr<T>;
 
 inline constexpr int RENATR_SHOW_NAME = 1;
 
+class BasicSpacecraft;
+
 struct BodyOptions {
     std::string name = "";
     float radius = 1.0f;
@@ -26,6 +28,23 @@ struct BodyOptions {
     int rings = 32;
     int slices = 32;
 };
+struct BasicSpacecraftOptions {
+    std::string name = "";
+    float radius = 1.0f;
+    Color color = RED;
+    float bounce = 1.0f;
+    dez::Vec3 position = dez::Vec3::ZERO;
+    dez::Vec3 scale = dez::Vec3::ONE;
+    dez::Vec3 rotation = dez::Vec3::ZERO;
+    dez::Vec3 velocity = dez::Vec3::ZERO;
+    double mass = 1.0f;
+    bool collide = true;
+    bool isStatic = false;
+    int rings = 32;
+    int slices = 32;
+    double fuel = 100.0f;
+};
+
 struct XZClue {
     bool enabled = false;
     int slices = 40;
@@ -42,16 +61,50 @@ struct GravityBody {
     GravityBody(uq<dez::PhysicsObject> physics_, const std::string& name_ = "");
 };
 struct CelestialSystem {
-    std::vector<uq<GravityBody>> bodies;
+    std::vector<GravityBody*> bodies;
 
     void tick(float delta);
 
-    GravityBody& addBody(uq<GravityBody> body);
-    GravityBody& addBody(uq<dez::PhysicsObject> physics, const std::string& name = "");
-    GravityBody& addBody(const BodyOptions& options);
+    uq<GravityBody> addBody(uq<GravityBody> body);
+    uq<GravityBody> addBody(uq<dez::PhysicsObject> physics, const std::string& name = "");
+    uq<GravityBody> addBody(const BodyOptions& options);
+    uq<BasicSpacecraft> addSpacecraft(const BasicSpacecraftOptions& options);
 
     CelestialSystem() = default;
 };
+struct BasicSpacecraft {
+    uq<GravityBody> body;
+    dez::PhysicsObject* physics;
+    double fuel = 100.0f;
+    double fuelElapseRate = 0.5f;
+
+    // Fuel
+    void setFuel(float amount);
+    void elapseFuel(float amount);
+    void refuel(float amount);
+
+    // Thrust
+    void applyThrust(const dez::Vec3& amount);
+
+    // Constructors
+    BasicSpacecraft(uq<GravityBody> body_) : body(std::move(body_)), physics(body->physics.get()) {}
+    BasicSpacecraft(const BasicSpacecraftOptions& options) {
+        body = std::make_unique<GravityBody>(
+            std::make_unique<dez::PhysicsObject>(
+                dez::DrawObject(GenMeshSphere(options.radius, options.rings, options.slices),
+                                dez::Transform(options.position, options.rotation, options.scale),
+                                options.color),
+                options.bounce),
+            options.name);
+        body->physics->enableCollisions(options.collide);
+        body->physics->enableStatic(options.isStatic);
+        body->physics->core.applyVelocity(options.velocity);
+        body->physics->core.mass = options.mass;
+        physics = body->physics.get();
+        fuel = options.fuel;
+    }
+};
+
 struct Renderer {
     XZClue xzclue;
     std::unordered_map<const GravityBody*, std::unordered_set<int>> attributes;

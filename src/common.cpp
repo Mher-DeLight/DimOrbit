@@ -8,28 +8,29 @@ namespace DimOrbit {
 void CelestialSystem::tick(float delta) {
     for (auto& i : bodies) {
         for (auto& j : bodies) {
-            if (i.get() == j.get())
+            if (i == j)
                 continue;
 
-            i->gravitate_Newtonian(j.get(), delta);
+            i->gravitate_Newtonian(j, delta);
         }
     }
 
     for (auto& obj : bodies) {
-        dez::manager::tickObject(obj->physics.get(), delta);
+        dez::manager::tickObject(dez::manager::managedObject(obj->physics.get()), delta);
     }
 }
 
-GravityBody& CelestialSystem::addBody(uq<GravityBody> body) {
-    bodies.push_back(std::move(body));
-    return *bodies.back();
+uq<GravityBody> CelestialSystem::addBody(uq<GravityBody> body) {
+    bodies.push_back(body.get());
+    return body;
 }
-GravityBody& CelestialSystem::addBody(uq<dez::PhysicsObject> body, const std::string& name) {
-    bodies.push_back(std::make_unique<GravityBody>(std::move(body)));
-    bodies.back()->name = name;
-    return *bodies.back();
+uq<GravityBody> CelestialSystem::addBody(uq<dez::PhysicsObject> body, const std::string& name) {
+    auto newbody = std::make_unique<GravityBody>(std::move(body));
+    newbody->name = name;
+    bodies.push_back(newbody.get());
+    return newbody;
 }
-GravityBody& CelestialSystem::addBody(const BodyOptions& options) {
+uq<GravityBody> CelestialSystem::addBody(const BodyOptions& options) {
     // clang-format off
     auto body = std::make_unique<GravityBody>(std::make_unique<dez::PhysicsObject>(
         dez::DrawObject(
@@ -43,9 +44,14 @@ GravityBody& CelestialSystem::addBody(const BodyOptions& options) {
     body->physics->enableStatic(options.isStatic);
     body->physics->core.applyVelocity(options.velocity);
     body->physics->core.mass = options.mass;
-    bodies.push_back(std::move(body));
-    return *bodies.back();
+    bodies.push_back(body.get());
+    return body;
     // clang-format on
+}
+uq<BasicSpacecraft> CelestialSystem::addSpacecraft(const BasicSpacecraftOptions& options) {
+    auto spacecraft = std::make_unique<BasicSpacecraft>(options);
+    bodies.push_back(spacecraft->body.get());
+    return spacecraft;
 }
 
 // == RENDERER ==
@@ -77,7 +83,7 @@ void Renderer::renderCS(const CelestialSystem& csystem, Camera& camera, Color bg
     for (auto& body : csystem.bodies) {
         body->physics->core.shape.draw();
 
-        if (hasAttribute(*body.get(), RENATR_SHOW_NAME)) {
+        if (hasAttribute(*body, RENATR_SHOW_NAME)) {
             nameLabels.push_back({
                 body->name,
                 GetWorldToScreen(Vector3{body->physics->transform.position.x,

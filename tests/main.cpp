@@ -17,21 +17,30 @@ int main(int, char**) {
                                                     });
     camera.setTarget(dez::Vec3{0.0f, 0.0f, 0.0f});
 
-    auto& sun = system.addBody({.name = "Sun",
-                                .radius = 1.0f,
-                                .color = YELLOW,
-                                .velocity = dez::Vec3::UP,
-                                .mass = 2.0,
-                                .collide = false});
-    renderer.addAttribute(sun, dor::RENATR_SHOW_NAME);
-    auto& earth = system.addBody(dor::BodyOptions{.name = "Earth",
-                                                  .radius = 0.2f,
-                                                  .color = GREEN,
-                                                  .position = dez::Vec3{-8.0f, 0.0f, 0.0f},
-                                                  .velocity = dez::Vec3{0.0f, 0.0f, 2.2f},
-                                                  .mass = 6e-6,
-                                                  .collide = false});
-    renderer.addAttribute(earth, dor::RENATR_SHOW_NAME);
+    auto sun = system.addBody(dor::BodyOptions{.name = "Sun",
+                                               .radius = 1.0f,
+                                               .color = YELLOW,
+                                               .velocity = dez::Vec3::UP,
+                                               .mass = 2.0,
+                                               .collide = false});
+
+    auto earth = system.addBody(dor::BodyOptions{.name = "Earth",
+                                                 .radius = 0.2f,
+                                                 .color = GREEN,
+                                                 .position = dez::Vec3{-8.0f, 0.0f, 0.0f},
+                                                 .velocity = dez::Vec3{0.0f, 0.0f, 2.2f},
+                                                 .mass = 6e-6,
+                                                 .collide = false});
+
+    auto spacecraft =
+        system.addSpacecraft(dor::BasicSpacecraftOptions{.name = "Explorer",
+                                                         .radius = 0.05f,
+                                                         .color = BLUE,
+                                                         .position = dez::Vec3{10.0f, 0.0f, 5.0f},
+                                                         .velocity = dez::Vec3{-1.0f, 0.0f, -1.0f},
+                                                         .mass = 1e-23,
+                                                         .collide = false});
+    renderer.addAttribute(*spacecraft->body.get(), dor::RENATR_SHOW_NAME);
 
     constexpr float CAM_SPEED = 5.0f;
     constexpr float CAM_VERTICAL_SPEED = 50.0f;
