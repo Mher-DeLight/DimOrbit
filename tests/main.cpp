@@ -17,8 +17,12 @@ int main(int, char**) {
                                                     });
     camera.setTarget(dez::Vec3{0.0f, 0.0f, 0.0f});
 
-    auto& sun = system.addBody(
-        {.name = "Sun", .radius = 1.0f, .color = YELLOW, .mass = 2.0, .collide = false});
+    auto& sun = system.addBody({.name = "Sun",
+                                .radius = 1.0f,
+                                .color = YELLOW,
+                                .velocity = dez::Vec3::UP,
+                                .mass = 2.0,
+                                .collide = false});
     auto& earth = system.addBody(dor::BodyOptions{.name = "Earth",
                                                   .radius = 0.2f,
                                                   .color = GREEN,
