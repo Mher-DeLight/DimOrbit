@@ -26,7 +26,8 @@ int main(int, char**) {
         .position = Vec3{5.0f, 0.0f, 0.0f},
         .mass = 1e-3,
     });
-    explorer->body->beginOrbit(*earth.get(), 1.0f, 0.0f);
+    explorer->engine.start();
+    explorer->engine.setThrust(Vec3{5e-2f, 0.0f, 0.0f});
     renderer.addAttribute(*explorer->body.get(), dor::RENATR_SHOW_NAME);
 
     constexpr float CAM_SPEED = 5.0f;
@@ -42,6 +43,7 @@ int main(int, char**) {
             camera.lookAround(-dez::input::getAxis(KEY_LEFT, KEY_RIGHT) * CAM_LOOK_SPEED * delta,
                               dez::input::getAxis(KEY_DOWN, KEY_UP) * CAM_LOOK_SPEED * delta);
 
+            explorer->tick(delta);
             system.tick(delta);
             return true;
         },

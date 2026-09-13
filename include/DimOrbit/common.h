@@ -75,21 +75,29 @@ struct CelestialSystem {
 
     CelestialSystem() = default;
 };
+
+// == SPACECRAFT ==
+struct Engine {
+    bool isStarted = false;
+    dez::Vec3 thrust = dez::Vec3::ZERO;
+
+    void start();
+    void applyThrust(const dez::Vec3& amount);
+    void setThrust(const dez::Vec3& newthrust);
+    void turnoff();
+};
 struct BasicSpacecraft {
     uq<GravityBody> body;
     dez::PhysicsObject* physics;
     double fuel = 100.0f;
     double fuelElapseRate = 1.0f;
     dez::Vec3 thrust = dez::Vec3::ZERO;
+    Engine engine;
 
     // Fuel
     void setFuel(float amount);
     void elapseFuel(float amount);
     void refuel(float amount);
-
-    // Thrust
-    void applyThrust(const dez::Vec3& amount);
-    void setThrust(const dez::Vec3& newthrust);
 
     // Constructors
     BasicSpacecraft(uq<GravityBody> body_) : body(std::move(body_)), physics(body->physics.get()) {}
