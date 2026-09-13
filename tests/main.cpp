@@ -16,9 +16,9 @@ int main(int, char**) {
 
     auto sun = system.addBody(
         dor::BodyOptions{.name = "Sun", .radius = 5.0f, .color = YELLOW, .mass = 100.0f});
-    auto earth = system.addBody(
+    /* auto earth = system.addBody(
         dor::BodyOptions{.name = "Earth", .radius = 1.0f, .color = GREEN, .mass = 1.0f});
-    earth->beginOrbit(*sun.get(), 3.0f, 0.0f);
+    earth->beginOrbit(*sun.get(), 3.0f, 0.0f); */
     auto explorer = system.addSpacecraft(dor::BasicSpacecraftOptions{
         .name = "Explorer",
         .radius = 0.1f,
@@ -27,7 +27,7 @@ int main(int, char**) {
         .mass = 1e-3,
     });
     explorer->engine.start();
-    explorer->engine.setThrust(Vec3{5e-2f, 0.0f, 0.0f});
+    explorer->engine.setThrust(Vec3{3e-2f, 0.0f, 0.0f});
     renderer.addAttribute(*explorer->body.get(), dor::RENATR_SHOW_NAME);
 
     constexpr float CAM_SPEED = 5.0f;
@@ -48,11 +48,19 @@ int main(int, char**) {
             return true;
         },
         [&]() {
-            BeginDrawing();
+            renderer.begin(BLACK);
 
-            renderer.renderCS(system, camera);
+            renderer.begin3d(camera);
+            renderer.render(system);
+            renderer.displayVector(explorer->physics->core.velocity,
+                                   explorer->physics->transform.position);
+            renderer.displayVector(explorer->engine.thrust * 10.0f,
+                                   explorer->physics->transform.position, RED);
+            renderer.end3d();
 
-            EndDrawing();
+            renderer.renderLabels(system, RED);
+
+            renderer.end();
             return true;
         });
 }

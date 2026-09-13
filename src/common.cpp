@@ -56,10 +56,64 @@ uq<BasicSpacecraft> CelestialSystem::addSpacecraft(const BasicSpacecraftOptions&
 }
 
 // == RENDERER ==
-void Renderer::renderCS(const CelestialSystem& csystem, Camera& camera, Color bgColor) const {
+void Renderer::begin(const Color& bgColor) {
+    BeginDrawing();
+    isDrawingMode = true;
     ClearBackground(bgColor);
+}
+void Renderer::begin3d(dez::Camera& camera) {
     BeginMode3D(camera);
+    isMode3D = true;
+    mainCamera = camera;
+}
+void Renderer::end3d() {
+    EndMode3D();
+    isMode3D = false;
+}
+void Renderer::end() {
+    if (isMode3D) {
+        isMode3D = false;
+        EndMode3D();
+    }
+    EndDrawing();
+    isDrawingMode = false;
+    mainCamera.reset();
+}
 
+void Renderer::displayVector(const dez::Vec3& vector, const dez::Vec3& origin, const Color& color) {
+    DrawLine3D(origin, origin + vector, color);
+}
+void Renderer::renderLabels(const CelestialSystem& csystem, const Color& color) {
+    if (!mainCamera.has_value())
+        throw std::runtime_error("DimOrbit: cannot render labels without camera");
+
+    struct NameLabel {
+        std::string text;
+        Vector2 position;
+    };
+
+    std::vector<NameLabel> nameLabels;
+
+    for (auto& body : csystem.bodies) {
+        if (hasAttribute(*body, RENATR_SHOW_NAME)) {
+            nameLabels.push_back({
+                body->name,
+                GetWorldToScreen(
+                    Vector3{body->physics->transform.position.x,
+                            body->physics->collision.center.y + body->physics->collision.radius,
+                            body->physics->transform.position.z},
+                    mainCamera.value().get()),
+            });
+        }
+    }
+
+    for (const auto& label : nameLabels) {
+        DrawText(label.text.c_str(), static_cast<int>(label.position.x),
+                 static_cast<int>(label.position.y), 20, color);
+    }
+}
+
+void Renderer::render(const CelestialSystem& csystem) const {
     if (isXZClueEnabled()) {
         const float GROUND_SLICES = xzclue.slices;
         const float GROUND_HEIGHT = xzclue.height;
@@ -80,33 +134,8 @@ void Renderer::renderCS(const CelestialSystem& csystem, Camera& camera, Color bg
                    Vector3{0.0f, GROUND_HEIGHT, GROUND_EXTENT}, BLUE);
     }
 
-    struct NameLabel {
-        std::string text;
-        Vector2 position;
-    };
-    std::vector<NameLabel> nameLabels;
-
     for (auto& body : csystem.bodies) {
         body->physics->core.shape.draw();
-
-        if (hasAttribute(*body, RENATR_SHOW_NAME)) {
-            nameLabels.push_back({
-                body->name,
-                GetWorldToScreen(
-                    Vector3{body->physics->transform.position.x,
-                            body->physics->collision.center.y + body->physics->collision.radius,
-                            body->physics->transform.position.z},
-                    camera),
-            });
-        }
-    }
-
-    EndMode3D();
-
-    constexpr Color nameColor = RED;
-    for (const auto& label : nameLabels) {
-        DrawText(label.text.c_str(), static_cast<int>(label.position.x),
-                 static_cast<int>(label.position.y), 20, nameColor);
     }
 }
 bool Renderer::isXZClueEnabled() const {

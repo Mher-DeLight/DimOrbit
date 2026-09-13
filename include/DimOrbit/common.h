@@ -122,6 +122,9 @@ struct BasicSpacecraft {
 struct Renderer {
     XZClue xzclue;
     std::unordered_map<const GravityBody*, std::unordered_set<int>> attributes;
+    std::optional<std::reference_wrapper<dez::Camera>> mainCamera;
+    bool isMode3D = false;
+    bool isDrawingMode = false;
 
     // Attributes
     void addAttribute(const GravityBody& object, int attribute);
@@ -133,7 +136,17 @@ struct Renderer {
     bool enableXZClue(bool is_true = true); // returns the old state
 
     // Render Methods
-    void renderCS(const CelestialSystem& csystem, Camera& camera, Color bgColor = BLACK) const;
+    void begin(const Color& bgColor = BLACK);
+    void begin3d(dez::Camera& camera);
+
+    void displayVector(const dez::Vec3& vector, const dez::Vec3& origin,
+                       const Color& color = PURPLE);
+    void renderLabels(const CelestialSystem& csystem, const Color& color = RED);
+
+    void render(const CelestialSystem& csystem) const;
+
+    void end3d();
+    void end();
 };
 
 } // namespace DimOrbit
