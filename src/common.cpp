@@ -80,6 +80,19 @@ void Renderer::end() {
     mainCamera.reset();
 }
 
+int Renderer::doindraw(const Color& bgColor, std::function<int()> func) {
+    begin(bgColor);
+    int code = func();
+    end();
+    return code;
+}
+int Renderer::doin3d(dez::Camera& camera, std::function<int()> func) {
+    begin3d(camera);
+    int code = func();
+    end3d();
+    return code;
+}
+
 void Renderer::displayVector(const dez::Vec3& vector, const dez::Vec3& origin, const Color& color) {
     DrawLine3D(origin, origin + vector, color);
 }

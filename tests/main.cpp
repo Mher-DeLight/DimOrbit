@@ -48,19 +48,20 @@ int main(int, char**) {
             return true;
         },
         [&]() {
-            renderer.begin(BLACK);
+            renderer.doindraw(BLACK, [&]() {
+                renderer.doin3d(camera, [&]() {
+                    renderer.render(system);
+                    renderer.displayVector(explorer->physics->core.velocity,
+                                           explorer->physics->transform.position);
+                    renderer.displayVector(explorer->engine.thrust * 10.0f,
+                                           explorer->physics->transform.position, RED);
+                    return 0;
+                });
 
-            renderer.begin3d(camera);
-            renderer.render(system);
-            renderer.displayVector(explorer->physics->core.velocity,
-                                   explorer->physics->transform.position);
-            renderer.displayVector(explorer->engine.thrust * 10.0f,
-                                   explorer->physics->transform.position, RED);
-            renderer.end3d();
+                renderer.renderLabels(system, RED);
+                return 0;
+            });
 
-            renderer.renderLabels(system, RED);
-
-            renderer.end();
             return true;
         });
 }

@@ -138,6 +138,8 @@ struct Renderer {
     // Render Methods
     void begin(const Color& bgColor = BLACK);
     void begin3d(dez::Camera& camera);
+    int doindraw(const Color& bgColor, std::function<int()> func);
+    int doin3d(dez::Camera& camera, std::function<int()> func);
 
     void displayVector(const dez::Vec3& vector, const dez::Vec3& origin,
                        const Color& color = PURPLE);
