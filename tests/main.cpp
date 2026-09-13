@@ -30,13 +30,17 @@ int main(int, char**) {
     renderer.addAttribute(*explorer->body.get(), dor::RENATR_SHOW_NAME);
 
     constexpr float CAM_SPEED = 5.0f;
+    constexpr float CAM_LOOK_SPEED = 2.0f;
 
     return dez::manager::fixedloop(
         60, 60,
         [&](float delta) {
-            camera.moveX(dez::input::getAxis(KEY_A, KEY_D) * CAM_SPEED * delta);
-            camera.moveY(dez::input::getAxis(KEY_LEFT_SHIFT, KEY_SPACE) * CAM_SPEED * delta);
-            camera.moveZ(-dez::input::getAxis(KEY_S, KEY_W) * CAM_SPEED * delta);
+            camera.moveRight(dez::input::getAxis(KEY_A, KEY_D) * CAM_SPEED * delta);
+            camera.moveUp(dez::input::getAxis(KEY_LEFT_SHIFT, KEY_SPACE) * CAM_SPEED * delta);
+            camera.moveForward(dez::input::getAxis(KEY_S, KEY_W) * CAM_SPEED * delta);
+
+            camera.lookAround(-dez::input::getAxis(KEY_LEFT, KEY_RIGHT) * CAM_LOOK_SPEED * delta,
+                              dez::input::getAxis(KEY_DOWN, KEY_UP) * CAM_LOOK_SPEED * delta);
 
             system.tick(delta);
             return true;

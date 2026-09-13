@@ -1,4 +1,6 @@
 #pragma once
+#include <algorithm>
+#include <cmath>
 #include <functional>
 #include <raylib.h>
 #include <raymath.h>
@@ -306,9 +308,72 @@ public:
     void moveY(float amount);
     void moveZ(float amount);
 
+    inline void moveForward(float amount) {
+        move(Vector3Normalize(direction) * amount);
+    }
+    inline void moveBackward(float amount) {
+        moveForward(-amount);
+    }
+    inline void moveRight(float amount) {
+        const Vector3 forward = Vector3Normalize(direction);
+        const Vector3 right = Vector3Normalize(Vector3CrossProduct(forward, up));
+        move(right * amount);
+    }
+    inline void moveLeft(float amount) {
+        moveRight(-amount);
+    }
+    inline void moveUp(float amount) {
+        const Vector3 forward = Vector3Normalize(direction);
+        const Vector3 right = Vector3Normalize(Vector3CrossProduct(forward, up));
+        const Vector3 cameraUp = Vector3Normalize(Vector3CrossProduct(right, forward));
+        move(cameraUp * amount);
+    }
+    inline void moveDown(float amount) {
+        moveUp(-amount);
+    }
+
+    inline void lookAround(float yaw, float pitch) {
+        constexpr float PITCH_LIMIT = PI / 2.0f - 0.01f;
+
+        const float directionLength = Vector3Length(direction);
+        if (directionLength == 0.0f)
+            return;
+
+        const Vector3 worldUp = Vector3Normalize(up);
+        Vector3 forward = Vector3Normalize(direction);
+        forward = Vector3RotateByAxisAngle(forward, worldUp, yaw);
+
+        const float currentPitch =
+            std::asin(std::clamp(Vector3DotProduct(forward, worldUp), -1.0f, 1.0f));
+        const float targetPitch = std::clamp(currentPitch + pitch, -PITCH_LIMIT, PITCH_LIMIT);
+        const Vector3 right = Vector3Normalize(Vector3CrossProduct(forward, worldUp));
+        forward = Vector3RotateByAxisAngle(forward, right, targetPitch - currentPitch);
+
+        direction = forward * directionLength;
+        refreshTarget();
+    }
+
     void goTo(const Vector3& pos);
     void goToX(float x);
     void goToY(float y);
     void goToZ(float z);
+
+    inline void rotateX(float amount) {
+        direction = Vector3Transform(direction, MatrixRotateX(amount));
+        refreshTarget();
+    }
+    inline void rotateY(float amount) {
+        direction = Vector3Transform(direction, MatrixRotateY(amount));
+        refreshTarget();
+    }
+    inline void rotateZ(float amount) {
+        direction = Vector3Transform(direction, MatrixRotateZ(amount));
+        refreshTarget();
+    }
+    inline void rotate(const Vector3& rotation) {
+        rotateX(rotation.x);
+        rotateY(rotation.y);
+        rotateZ(rotation.z);
+    }
 };
 } // namespace DimEngineZ
