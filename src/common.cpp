@@ -205,6 +205,7 @@ void Engine::start() {
     isStarted = true;
 }
 void Engine::turnoff() {
+    thrust = dez::Vec3::ZERO;
     isStarted = false;
 }
 

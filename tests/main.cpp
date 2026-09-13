@@ -10,31 +10,31 @@ int main(int, char**) {
     auto system = dor::CelestialSystem();
     auto renderer = dor::Renderer();
     renderer.enableXZClue(true);
+    renderer.xzclue.spacing = 2.0f;
+    renderer.xzclue.slices = 20;
 
     auto camera = dez::Camera({-5.0f, 5.0f, 5.0f});
     camera.setTarget({0.0f, 0.0f, 0.0f});
 
     auto sun = system.addBody(
-        dor::BodyOptions{.name = "Sun", .radius = 5.0f, .color = YELLOW, .mass = 100.0f});
+        dor::BodyOptions{.name = "Sun", .radius = 5.0f, .color = YELLOW, .mass = 1.0f});
     auto explorer = system.addSpacecraft(dor::BasicSpacecraftOptions{
         .name = "Explorer",
         .radius = 0.1f,
         .color = WHITE,
-        .position = Vec3{5.0f, 0.0f, 0.0f},
+        .position = Vec3{20.0f, 0.0f, 0.0f},
         .mass = 1e-3,
     });
-    explorer->engine.start();
-    explorer->engine.setThrust(Vec3{3e-2f, 0.0f, 0.0f});
+    explorer->body->beginOrbit(*sun.get(), 5.0f, 0.0f);
     renderer.addAttribute(*explorer->body.get(), dor::RENATR_SHOW_NAME);
 
-    constexpr float CAM_SPEED = 5.0f;
+    constexpr float CAM_SPEED = 15.0f;
     constexpr float CAM_LOOK_SPEED = 2.0f;
 
     return dez::manager::fixedloop(
         60, 60,
         [&](float delta) {
             camera.moveRight(dez::input::getAxis(KEY_A, KEY_D) * CAM_SPEED * delta);
-            camera.moveUp(dez::input::getAxis(KEY_LEFT_SHIFT, KEY_SPACE) * CAM_SPEED * delta);
             camera.moveForward(dez::input::getAxis(KEY_S, KEY_W) * CAM_SPEED * delta);
 
             camera.lookAround(-dez::input::getAxis(KEY_LEFT, KEY_RIGHT) * CAM_LOOK_SPEED * delta,
@@ -50,7 +50,7 @@ int main(int, char**) {
                     renderer.render(system);
                     renderer.displayVector(explorer->physics->core.velocity,
                                            explorer->physics->transform.position);
-                    renderer.displayVector(explorer->engine.thrust * 10.0f,
+                    renderer.displayVector(explorer->engine.thrust * 1e3f,
                                            explorer->physics->transform.position, RED);
                     return 0;
                 });
