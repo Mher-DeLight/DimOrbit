@@ -16,9 +16,6 @@ int main(int, char**) {
 
     auto sun = system.addBody(
         dor::BodyOptions{.name = "Sun", .radius = 5.0f, .color = YELLOW, .mass = 100.0f});
-    /* auto earth = system.addBody(
-        dor::BodyOptions{.name = "Earth", .radius = 1.0f, .color = GREEN, .mass = 1.0f});
-    earth->beginOrbit(*sun.get(), 3.0f, 0.0f); */
     auto explorer = system.addSpacecraft(dor::BasicSpacecraftOptions{
         .name = "Explorer",
         .radius = 0.1f,
