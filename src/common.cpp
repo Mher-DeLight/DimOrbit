@@ -109,6 +109,12 @@ void Renderer::renderLabels(const CelestialSystem& csystem, const Color& color) 
 
     for (auto& body : csystem.bodies) {
         if (hasAttribute(*body, RENATR_SHOW_NAME)) {
+            float dot = Vector3DotProduct(
+                Vector3Normalize(Vector3Subtract(mainCamera.value().get().position,
+                                                 body->physics->transform.position)),
+                Vector3Normalize(mainCamera.value().get().direction));
+            if (dot > 0.0f)
+                continue;
             nameLabels.push_back({
                 body->name,
                 GetWorldToScreen(
