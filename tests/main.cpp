@@ -45,8 +45,9 @@ int main(int, char**) {
 
             system.tick(delta);
 
-            auto inVec = dez::input::getVector2(KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP);
-            explorer->engine.setMaxThrust(Vec3{inVec.x, 0.0f, inVec.y} * 3e-9);
+            auto inVec = dez::input::getVector3(KEY_LEFT, KEY_RIGHT, KEY_RIGHT_SHIFT, KEY_KP_1,
+                                                KEY_DOWN, KEY_UP);
+            explorer->engine.setMaxThrust(inVec * 3e-9);
             return true;
         },
         [&]() {
