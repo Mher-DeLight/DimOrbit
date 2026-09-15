@@ -30,19 +30,28 @@ struct BodyOptions {
 };
 struct BasicSpacecraftOptions {
     std::string name = "";
+
     float radius = 1.0f;
     Color color = RED;
+
     float bounce = 1.0f;
+
     dez::Vec3 position = dez::Vec3::ZERO;
     dez::Vec3 scale = dez::Vec3::ONE;
     dez::Vec3 rotation = dez::Vec3::ZERO;
     dez::Vec3 velocity = dez::Vec3::ZERO;
+
     double mass = 1.0f;
+
     bool collide = true;
     bool isStatic = false;
+
     int rings = 32;
     int slices = 32;
-    double fuel = 100.0f;
+
+    double fuel = 100.0;
+    double maxFuel = 100.0;
+    double fuelElapseRate = 2.5;
 };
 
 struct XZClue {
@@ -110,19 +119,15 @@ struct FuelTank {
 
     double fuel() const;
     double maxFuel() const;
+    bool isEmpty() const;
 };
 struct BasicSpacecraft {
     uq<GravityBody> body;
     dez::PhysicsObject* physics;
-    double fuel = 100.0f;
+    FuelTank fuelTank;
     double fuelElapseRate = 1.0f;
     dez::Vec3 thrust = dez::Vec3::ZERO;
     Engine engine;
-
-    // Fuel
-    void setFuel(float amount);
-    void elapseFuel(float amount);
-    void refuel(float amount);
 
     // Constructors
     BasicSpacecraft(uq<GravityBody> body_) : body(std::move(body_)), physics(body->physics.get()) {}
@@ -139,7 +144,10 @@ struct BasicSpacecraft {
         body->physics->core.applyVelocity(options.velocity);
         body->physics->core.mass = options.mass;
         physics = body->physics.get();
-        fuel = options.fuel;
+        fuelElapseRate = options.fuelElapseRate;
+        fuelTank.setMaxFuel(options.maxFuel);
+        fuelTank.setFuel(options.fuel);
+        fuelTank.clampFuel();
     }
     void tick(float delta);
 };

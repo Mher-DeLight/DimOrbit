@@ -308,24 +308,19 @@ double FuelTank::fuel() const {
 double FuelTank::maxFuel() const {
     return _maxFuel;
 }
+bool FuelTank::isEmpty() const {
+    return fuel() <= 0.0;
+}
 
 // == BASIC SPACECRAFT ==
-void BasicSpacecraft::setFuel(float amount) {
-    fuel = amount;
-}
-void BasicSpacecraft::elapseFuel(float amount) {
-    fuel -= amount;
-}
-void BasicSpacecraft::refuel(float amount) {
-    fuel += amount;
-}
-
 void BasicSpacecraft::tick(float delta) {
     if (engine.maxThrust.x == 0 && engine.maxThrust.y == 0 && engine.maxThrust.z == 0)
         return; // if there is no thrust, movement will be handled by gravitate_Newtonian
+    if (fuelTank.isEmpty())
+        return;
 
     physics->core.applyForce(engine.thrust(), delta);
-    elapseFuel(fuelElapseRate * delta);
+    fuelTank.consumeFuel(fuelElapseRate * delta);
 }
 
 } // namespace DimOrbit

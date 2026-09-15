@@ -24,6 +24,7 @@ int main(int, char**) {
         .color = WHITE,
         .position = Vec3{20.0f, 0.0f, 0.0f},
         .mass = 1e-9,
+        .fuelElapseRate = 2.5,
     });
     explorer->engine.start();
     explorer->engine.setThrottle(0.9);
