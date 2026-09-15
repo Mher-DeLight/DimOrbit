@@ -7,6 +7,11 @@ namespace DimOrbit {
 
 // == CELESTIAL SYSTEM ==
 void CelestialSystem::tick(float delta) {
+    // body-spceific ticks
+    for (auto& i : basicSpacecrafts) {
+        i->tick(delta);
+        bodies.push_back(i->body.get());
+    }
     for (auto& i : bodies) {
         for (auto& j : bodies) {
             if (i == j)
@@ -16,6 +21,11 @@ void CelestialSystem::tick(float delta) {
         }
     }
 
+    // manager ticks
+    for (auto& i : basicSpacecrafts) {
+        bodies.erase(std::find(bodies.begin(), bodies.end(), i->body.get()));
+        dez::manager::tickObject(dez::manager::managedObject(i->body->physics.get()), delta);
+    }
     for (auto& obj : bodies) {
         dez::manager::tickObject(dez::manager::managedObject(obj->physics.get()), delta);
     }
@@ -51,7 +61,7 @@ uq<GravityBody> CelestialSystem::addBody(const BodyOptions& options) {
 }
 uq<BasicSpacecraft> CelestialSystem::addSpacecraft(const BasicSpacecraftOptions& options) {
     auto spacecraft = std::make_unique<BasicSpacecraft>(options);
-    bodies.push_back(spacecraft->body.get());
+    basicSpacecrafts.push_back(spacecraft.get());
     return spacecraft;
 }
 
@@ -125,6 +135,25 @@ void Renderer::renderLabels(const CelestialSystem& csystem, const Color& color) 
             });
         }
     }
+    for (auto& bscpcraft : csystem.basicSpacecrafts) {
+        auto& body = bscpcraft->body;
+        if (hasAttribute(*body, RENATR_SHOW_NAME)) {
+            float dot = Vector3DotProduct(
+                Vector3Normalize(Vector3Subtract(mainCamera.value().get().position,
+                                                 body->physics->transform.position)),
+                Vector3Normalize(mainCamera.value().get().direction));
+            if (dot > 0.0f)
+                continue;
+            nameLabels.push_back({
+                body->name,
+                GetWorldToScreen(
+                    Vector3{body->physics->transform.position.x,
+                            body->physics->collision.center.y + body->physics->collision.radius,
+                            body->physics->transform.position.z},
+                    mainCamera.value().get()),
+            });
+        }
+    }
 
     for (const auto& label : nameLabels) {
         DrawText(label.text.c_str(), static_cast<int>(label.position.x),
@@ -155,6 +184,9 @@ void Renderer::render(const CelestialSystem& csystem) const {
 
     for (auto& body : csystem.bodies) {
         body->physics->core.shape.draw();
+    }
+    for (auto& bspccraft : csystem.basicSpacecrafts) {
+        bspccraft->body->physics->core.shape.draw();
     }
 }
 bool Renderer::isXZClueEnabled() const {

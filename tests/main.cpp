@@ -40,7 +40,6 @@ int main(int, char**) {
             camera.lookAround(-dez::input::getAxis(KEY_LEFT, KEY_RIGHT) * CAM_LOOK_SPEED * delta,
                               dez::input::getAxis(KEY_DOWN, KEY_UP) * CAM_LOOK_SPEED * delta);
 
-            explorer->tick(delta);
             system.tick(delta);
             return true;
         },

@@ -65,6 +65,7 @@ struct GravityBody {
 };
 struct CelestialSystem {
     std::vector<GravityBody*> bodies;
+    std::vector<BasicSpacecraft*> basicSpacecrafts;
 
     void tick(float delta);
 
