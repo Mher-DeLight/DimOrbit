@@ -26,6 +26,7 @@ int main(int, char**) {
         .mass = 1e-9,
     });
     explorer->engine.start();
+    explorer->engine.setThrottle(0.9);
     explorer->body->beginOrbit(*sun.get(), 5.0f, 0.0f);
     renderer.addAttribute(*explorer->body.get(), dor::RENATR_SHOW_NAME);
 
@@ -53,7 +54,7 @@ int main(int, char**) {
                     renderer.render(system);
                     renderer.displayVector(explorer->physics->core.velocity,
                                            explorer->physics->transform.position);
-                    renderer.displayVector(explorer->engine.thrust * 1e3f,
+                    renderer.displayVector(explorer->engine.thrust * 1e9f,
                                            explorer->physics->transform.position, RED);
                     return 0;
                 });

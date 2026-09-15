@@ -242,7 +242,7 @@ GravityBody::GravityBody(uq<dez::PhysicsObject> physics_, const std::string& nam
 void Engine::start() {
     isStarted = true;
 }
-void Engine::turnoff() {
+void Engine::stop() {
     thrust = dez::Vec3::ZERO;
     isStarted = false;
 }
@@ -256,6 +256,15 @@ void Engine::setThrust(const dez::Vec3& amount) {
     if (!isStarted)
         return;
     thrust = amount;
+}
+void Engine::setThrottle(double newthrottle) {
+    throttle = newthrottle;
+}
+double Engine::getThrottle() const {
+    return throttle;
+}
+dez::Vec3 Engine::getNetForce() const {
+    return thrust * throttle;
 }
 
 // == BASIC SPACECRAFT ==
@@ -273,7 +282,7 @@ void BasicSpacecraft::tick(float delta) {
     if (engine.thrust.x == 0 && engine.thrust.y == 0 && engine.thrust.z == 0)
         return; // if there is no thrust, movement will be handled by gravitate_Newtonian
 
-    physics->core.applyForce(engine.thrust, delta);
+    physics->core.applyForce(engine.getNetForce(), delta);
     elapseFuel(fuelElapseRate * delta);
 }
 

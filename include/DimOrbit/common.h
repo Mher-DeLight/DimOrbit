@@ -81,11 +81,17 @@ struct CelestialSystem {
 struct Engine {
     bool isStarted = false;
     dez::Vec3 thrust = dez::Vec3::ZERO;
+    double throttle = 1.0;
 
     void start();
+
+    void setThrottle(double newthrottle);
+    double getThrottle() const;
     void applyThrust(const dez::Vec3& amount);
     void setThrust(const dez::Vec3& newthrust);
-    void turnoff();
+    dez::Vec3 getNetForce() const;
+
+    void stop();
 };
 struct BasicSpacecraft {
     uq<GravityBody> body;
