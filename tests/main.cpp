@@ -16,15 +16,16 @@ int main(int, char**) {
     auto camera = dez::Camera({-5.0f, 5.0f, 5.0f});
     camera.setTarget({0.0f, 0.0f, 0.0f});
 
-    auto sun = system.addBody(
-        dor::BodyOptions{.name = "Sun", .radius = 5.0f, .color = YELLOW, .mass = 1.0f});
+    auto sun = system.addBody(dor::BodyOptions{
+        .name = "Sun", .radius = 5.0f, .color = YELLOW, .mass = 1.0f, .isStatic = true});
     auto explorer = system.addSpacecraft(dor::BasicSpacecraftOptions{
         .name = "Explorer",
         .radius = 0.1f,
         .color = WHITE,
         .position = Vec3{20.0f, 0.0f, 0.0f},
-        .mass = 1e-3,
+        .mass = 1e-9,
     });
+    explorer->engine.start();
     explorer->body->beginOrbit(*sun.get(), 5.0f, 0.0f);
     renderer.addAttribute(*explorer->body.get(), dor::RENATR_SHOW_NAME);
 
@@ -37,10 +38,13 @@ int main(int, char**) {
             camera.moveRight(dez::input::getAxis(KEY_A, KEY_D) * CAM_SPEED * delta);
             camera.moveForward(dez::input::getAxis(KEY_S, KEY_W) * CAM_SPEED * delta);
 
-            camera.lookAround(-dez::input::getAxis(KEY_LEFT, KEY_RIGHT) * CAM_LOOK_SPEED * delta,
-                              dez::input::getAxis(KEY_DOWN, KEY_UP) * CAM_LOOK_SPEED * delta);
+            camera.lookAround(-dez::input::getAxis(KEY_F, KEY_H) * CAM_LOOK_SPEED * delta,
+                              dez::input::getAxis(KEY_G, KEY_T) * CAM_LOOK_SPEED * delta);
 
             system.tick(delta);
+
+            auto inVec = dez::input::getVector2(KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP);
+            explorer->engine.setThrust(Vec3{inVec.x, 0.0f, inVec.y} * 3e-9);
             return true;
         },
         [&]() {
