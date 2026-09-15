@@ -93,6 +93,24 @@ struct Engine {
 
     void stop();
 };
+struct FuelTank {
+    double _fuel = 100.0;
+    double _maxFuel = 100.0;
+
+    void consumeFuel(double amount);
+    void setFuel(double amount);
+    void refuel(double amount);
+    void completeRefuel(); // sets fuel = maxFuel
+
+    void setMaxFuel(double amount);
+    void changeMaxFuel(double amount);
+
+    void clampFuel();
+    void clampFuel(double min, double max);
+
+    double fuel() const;
+    double maxFuel() const;
+};
 struct BasicSpacecraft {
     uq<GravityBody> body;
     dez::PhysicsObject* physics;

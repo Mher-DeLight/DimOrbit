@@ -267,6 +267,48 @@ dez::Vec3 Engine::thrust() const {
     return maxThrust * throttle;
 }
 
+// == FUEL TANK ==
+void FuelTank::clampFuel() {
+    clampFuel(0.0, maxFuel());
+}
+void FuelTank::clampFuel(double min, double max) {
+    if (_fuel < min) {
+        _fuel = min;
+    }
+    if (_fuel > max) {
+        _fuel = max;
+    }
+}
+void FuelTank::consumeFuel(double amount) {
+    _fuel -= amount;
+    clampFuel();
+}
+void FuelTank::setFuel(double amount) {
+    _fuel = amount;
+    clampFuel();
+}
+void FuelTank::refuel(double amount) {
+    _fuel += amount;
+    clampFuel();
+}
+void FuelTank::completeRefuel() {
+    _fuel = maxFuel();
+}
+
+void FuelTank::setMaxFuel(double amount) {
+    _maxFuel = amount;
+}
+void FuelTank::changeMaxFuel(double amount) {
+    _maxFuel += amount;
+}
+
+double FuelTank::fuel() const {
+    return _fuel;
+}
+double FuelTank::maxFuel() const {
+    return _maxFuel;
+}
+
 // == BASIC SPACECRAFT ==
 void BasicSpacecraft::setFuel(float amount) {
     fuel = amount;
