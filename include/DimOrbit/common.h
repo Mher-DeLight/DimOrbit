@@ -80,16 +80,16 @@ struct CelestialSystem {
 // == SPACECRAFT ==
 struct Engine {
     bool isStarted = false;
-    dez::Vec3 thrust = dez::Vec3::ZERO;
+    dez::Vec3 maxThrust = dez::Vec3::ZERO;
     double throttle = 1.0;
 
     void start();
 
     void setThrottle(double newthrottle);
     double getThrottle() const;
-    void applyThrust(const dez::Vec3& amount);
-    void setThrust(const dez::Vec3& newthrust);
-    dez::Vec3 getNetForce() const;
+    void applyMaxThrust(const dez::Vec3& amount);
+    void setMaxThrust(const dez::Vec3& newthrust);
+    dez::Vec3 thrust() const;
 
     void stop();
 };

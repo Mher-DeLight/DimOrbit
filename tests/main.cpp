@@ -45,7 +45,7 @@ int main(int, char**) {
             system.tick(delta);
 
             auto inVec = dez::input::getVector2(KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP);
-            explorer->engine.setThrust(Vec3{inVec.x, 0.0f, inVec.y} * 3e-9);
+            explorer->engine.setMaxThrust(Vec3{inVec.x, 0.0f, inVec.y} * 3e-9);
             return true;
         },
         [&]() {
@@ -54,7 +54,7 @@ int main(int, char**) {
                     renderer.render(system);
                     renderer.displayVector(explorer->physics->core.velocity,
                                            explorer->physics->transform.position);
-                    renderer.displayVector(explorer->engine.thrust * 1e9f,
+                    renderer.displayVector(explorer->engine.maxThrust * 1e9f,
                                            explorer->physics->transform.position, RED);
                     return 0;
                 });

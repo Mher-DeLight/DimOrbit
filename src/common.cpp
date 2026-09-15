@@ -243,19 +243,19 @@ void Engine::start() {
     isStarted = true;
 }
 void Engine::stop() {
-    thrust = dez::Vec3::ZERO;
+    maxThrust = dez::Vec3::ZERO;
     isStarted = false;
 }
 
-void Engine::applyThrust(const dez::Vec3& amount) {
+void Engine::applyMaxThrust(const dez::Vec3& amount) {
     if (!isStarted)
         return;
-    thrust += amount;
+    maxThrust += amount;
 }
-void Engine::setThrust(const dez::Vec3& amount) {
+void Engine::setMaxThrust(const dez::Vec3& amount) {
     if (!isStarted)
         return;
-    thrust = amount;
+    maxThrust = amount;
 }
 void Engine::setThrottle(double newthrottle) {
     throttle = newthrottle;
@@ -263,8 +263,8 @@ void Engine::setThrottle(double newthrottle) {
 double Engine::getThrottle() const {
     return throttle;
 }
-dez::Vec3 Engine::getNetForce() const {
-    return thrust * throttle;
+dez::Vec3 Engine::thrust() const {
+    return maxThrust * throttle;
 }
 
 // == BASIC SPACECRAFT ==
@@ -279,10 +279,10 @@ void BasicSpacecraft::refuel(float amount) {
 }
 
 void BasicSpacecraft::tick(float delta) {
-    if (engine.thrust.x == 0 && engine.thrust.y == 0 && engine.thrust.z == 0)
+    if (engine.maxThrust.x == 0 && engine.maxThrust.y == 0 && engine.maxThrust.z == 0)
         return; // if there is no thrust, movement will be handled by gravitate_Newtonian
 
-    physics->core.applyForce(engine.getNetForce(), delta);
+    physics->core.applyForce(engine.thrust(), delta);
     elapseFuel(fuelElapseRate * delta);
 }
 
