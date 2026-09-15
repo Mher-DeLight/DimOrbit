@@ -16,8 +16,8 @@ int main(int, char**) {
     auto camera = dez::Camera({-5.0f, 5.0f, 5.0f});
     camera.setTarget({0.0f, 0.0f, 0.0f});
 
-    auto sun = system.addBody(dor::BodyOptions{
-        .name = "Sun", .radius = 5.0f, .color = YELLOW, .mass = 1.0f, .isStatic = true});
+    auto sun = system.addBody(
+        dor::BodyOptions{.name = "Sun", .radius = 5.0f, .color = YELLOW, .mass = 1.0f});
     auto explorer = system.addSpacecraft(dor::BasicSpacecraftOptions{
         .name = "Explorer",
         .radius = 0.1f,
