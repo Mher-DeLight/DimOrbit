@@ -52,7 +52,6 @@ int main(int, char**) {
             camera.lookAround(-dez::input::getAxis(KEY_LEFT, KEY_RIGHT) * CAM_LOOK_SPEED * delta,
                               dez::input::getAxis(KEY_DOWN, KEY_UP) * CAM_LOOK_SPEED * delta);
 
-            explorer->tick(delta);
             system.tick(delta);
             return true;
         },
@@ -75,8 +74,4 @@ int main(int, char**) {
         });
 }
 ```
-As you can see, there is a strong separation between the actual physics (`dor::CelestialSystem`) and the rendering of the objects (`dor::Renderer`). Things such as labels, vectors, and drawing in 
-general are handled exclusively by the Renderer.
-
-> [!NOTE]
-> Due to current architecture complications, `dor::BasicSpacecraft` objects have to be `tick()`-ed manually. I am currently working on making the owning `dor::CelestialSystem` handle that.
+As you can see, there is a strong separation between the actual physics (`dor::CelestialSystem`) and the rendering of the objects (`dor::Renderer`). Things such as labels, vectors, and drawing in general are handled exclusively by the Renderer.
