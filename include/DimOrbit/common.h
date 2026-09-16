@@ -61,26 +61,26 @@ struct XZClue {
     float spacing = 1.0f;
 };
 
-struct GravityBody {
+struct CelestialBody {
     uq<dez::PhysicsObject> physics;
     std::string name = "";
 
-    void gravitate_Newtonian(GravityBody* other, float delta);
+    void gravitate_Newtonian(CelestialBody* other, float delta);
 
     // Utility
-    void beginOrbit(const GravityBody& other, double altitude, double inclination);
+    void beginOrbit(const CelestialBody& other, double altitude, double inclination);
 
-    GravityBody(uq<dez::PhysicsObject> physics_, const std::string& name_ = "");
+    CelestialBody(uq<dez::PhysicsObject> physics_, const std::string& name_ = "");
 };
 struct CelestialSystem {
-    std::vector<GravityBody*> bodies;
+    std::vector<CelestialBody*> bodies;
     std::vector<BasicSpacecraft*> basicSpacecrafts;
 
     void tick(float delta);
 
-    uq<GravityBody> addBody(uq<GravityBody> body);
-    uq<GravityBody> addBody(uq<dez::PhysicsObject> physics, const std::string& name = "");
-    uq<GravityBody> addBody(const BodyOptions& options);
+    uq<CelestialBody> addBody(uq<CelestialBody> body);
+    uq<CelestialBody> addBody(uq<dez::PhysicsObject> physics, const std::string& name = "");
+    uq<CelestialBody> addBody(const BodyOptions& options);
     uq<BasicSpacecraft> addSpacecraft(const BasicSpacecraftOptions& options);
 
     CelestialSystem() = default;
@@ -122,7 +122,7 @@ struct FuelTank {
     bool isEmpty() const;
 };
 struct BasicSpacecraft {
-    uq<GravityBody> body;
+    uq<CelestialBody> body;
     dez::PhysicsObject* physics;
     FuelTank fuelTank;
     double fuelElapseRate = 1.0f;
@@ -130,9 +130,10 @@ struct BasicSpacecraft {
     Engine engine;
 
     // Constructors
-    BasicSpacecraft(uq<GravityBody> body_) : body(std::move(body_)), physics(body->physics.get()) {}
+    BasicSpacecraft(uq<CelestialBody> body_)
+        : body(std::move(body_)), physics(body->physics.get()) {}
     BasicSpacecraft(const BasicSpacecraftOptions& options) {
-        body = std::make_unique<GravityBody>(
+        body = std::make_unique<CelestialBody>(
             std::make_unique<dez::PhysicsObject>(
                 dez::DrawObject(GenMeshSphere(options.radius, options.rings, options.slices),
                                 dez::Transform(options.position, options.rotation, options.scale),
@@ -154,15 +155,15 @@ struct BasicSpacecraft {
 
 struct Renderer {
     XZClue xzclue;
-    std::unordered_map<const GravityBody*, std::unordered_set<int>> attributes;
+    std::unordered_map<const CelestialBody*, std::unordered_set<int>> attributes;
     std::optional<std::reference_wrapper<dez::Camera>> mainCamera;
     bool isMode3D = false;
     bool isDrawingMode = false;
 
     // Attributes
-    void addAttribute(const GravityBody& object, int attribute);
-    void clearAttribtues(const GravityBody& object);
-    bool hasAttribute(const GravityBody& object, int attribute) const;
+    void addAttribute(const CelestialBody& object, int attribute);
+    void clearAttribtues(const CelestialBody& object);
+    bool hasAttribute(const CelestialBody& object, int attribute) const;
 
     // XZ Clue
     bool isXZClueEnabled() const;

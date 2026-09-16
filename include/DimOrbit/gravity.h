@@ -7,10 +7,10 @@ namespace DimOrbit::gravity {
 extern const double G;
 
 // == VARIABLES ==
-extern std::vector<DimOrbit::GravityBody*> bodyList;
+extern std::vector<DimOrbit::CelestialBody*> bodyList;
 
 // == FUNCTIONS ==
-void registerBody(DimOrbit::GravityBody* body);
+void registerBody(DimOrbit::CelestialBody* body);
 void tick(float delta);
 
 } // namespace DimOrbit::gravity

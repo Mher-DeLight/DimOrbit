@@ -5,10 +5,10 @@ namespace DimOrbit::gravity {
 const double G = 39.4784; // N*(m^2)/(kg^2)
 
 // == VARIABLES ==
-std::vector<DimOrbit::GravityBody*> bodyList;
+std::vector<DimOrbit::CelestialBody*> bodyList;
 
 // == FUNCTIONS ==
-void registerBody(DimOrbit::GravityBody* body) {
+void registerBody(DimOrbit::CelestialBody* body) {
     bodyList.push_back(body);
 }
 void tick(float delta) {
