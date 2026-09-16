@@ -13,12 +13,17 @@ void registerBody(DimOrbit::CelestialBody* body) {
 }
 void tick(float delta) {
     for (auto* i : bodyList) {
+        DimOrbit::Vec3 acceleration = DimOrbit::Vec3::ZERO;
         for (auto* j : bodyList) {
             if (i == j)
                 continue;
 
-            i->gravitate_Newtonian(j, delta);
+            acceleration += i->gravity.gravitateNewtonian(i->physics->transform.position,
+                                                          j->physics->transform.position,
+                                                          j->physics->core.mass);
         }
+        i->gravity.lastAcceleration = acceleration;
+        i->tick(delta);
     }
 }
 

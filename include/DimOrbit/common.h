@@ -7,11 +7,18 @@
 
 namespace DimOrbit {
 namespace dez = DimEngineZ;
+using Vec3 = dez::Vec3;
 template <typename T> using uq = std::unique_ptr<T>;
 
 inline constexpr int RENATR_SHOW_NAME = 1;
 
 class BasicSpacecraft;
+
+// == CALCULATORS ==
+struct GravityCalculator {
+    Vec3 lastAcceleration = Vec3::ZERO;
+    Vec3 gravitateNewtonian(const Vec3& posSelf, const Vec3& posOther, double massOther);
+};
 
 struct BodyOptions {
     std::string name = "";
@@ -63,13 +70,13 @@ struct XZClue {
 
 struct CelestialBody {
     uq<dez::PhysicsObject> physics;
+    GravityCalculator gravity;
     std::string name = "";
-
-    void gravitate_Newtonian(CelestialBody* other, float delta);
 
     // Utility
     void beginOrbit(const CelestialBody& other, double altitude, double inclination);
 
+    void tick(float delta);
     CelestialBody(uq<dez::PhysicsObject> physics_, const std::string& name_ = "");
 };
 struct CelestialSystem {

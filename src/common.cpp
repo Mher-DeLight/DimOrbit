@@ -5,29 +5,44 @@
 
 namespace DimOrbit {
 
+// == CALCULATORS ==
+Vec3 GravityCalculator::gravitateNewtonian(const Vec3& posSelf, const Vec3& posOther,
+                                           double massOther) {
+    Vec3 diff = posOther - posSelf;
+    double dist = diff.magnitude();
+
+    if (dist == 0.0f)
+        return Vec3::ZERO;
+
+    const double accelerationScale =
+        static_cast<double>(gravity::G * massOther / (dist * dist * dist));
+    lastAcceleration = diff * accelerationScale;
+    return lastAcceleration;
+}
+
 // == CELESTIAL SYSTEM ==
 void CelestialSystem::tick(float delta) {
-    // body-spceific ticks
+    std::vector<CelestialBody*> allBodies = bodies;
     for (auto& i : basicSpacecrafts) {
         i->tick(delta);
-        bodies.push_back(i->body.get());
+        allBodies.push_back(i->body.get());
     }
-    for (auto& i : bodies) {
-        for (auto& j : bodies) {
+
+    for (auto* i : allBodies) {
+        Vec3 acceleration = Vec3::ZERO;
+        for (auto* j : allBodies) {
             if (i == j)
                 continue;
 
-            i->gravitate_Newtonian(j, delta);
+            acceleration += i->gravity.gravitateNewtonian(i->physics->transform.position,
+                                                          j->physics->transform.position,
+                                                          j->physics->core.mass);
         }
+        i->gravity.lastAcceleration = acceleration;
     }
 
-    // manager ticks
-    for (auto& i : basicSpacecrafts) {
-        bodies.erase(std::find(bodies.begin(), bodies.end(), i->body.get()));
-        dez::manager::tickObject(dez::manager::managedObject(i->body->physics.get()), delta);
-    }
-    for (auto& obj : bodies) {
-        dez::manager::tickObject(dez::manager::managedObject(obj->physics.get()), delta);
+    for (auto* body : allBodies) {
+        body->tick(delta);
     }
 }
 
@@ -210,17 +225,6 @@ bool Renderer::hasAttribute(const CelestialBody& object, int attribute) const {
 }
 
 // == GRAVITY BODY ==
-void CelestialBody::gravitate_Newtonian(CelestialBody* other, float delta) {
-    dez::Vec3 diff = other->physics->transform.position - physics->transform.position;
-    double dist = diff.magnitude();
-
-    if (dist == 0.0f)
-        return;
-
-    const double accelerationScale =
-        static_cast<double>(gravity::G * other->physics->core.mass / (dist * dist * dist));
-    physics->core.applyAcceleration(diff * accelerationScale, delta);
-}
 void CelestialBody::beginOrbit(const CelestialBody& other, double altitude, double inclination) {
     const auto& otherPhysics = other.physics->core;
     const double orbitalRadius = static_cast<double>(other.physics->collision.radius) + altitude;
@@ -236,6 +240,12 @@ void CelestialBody::beginOrbit(const CelestialBody& other, double altitude, doub
 CelestialBody::CelestialBody(uq<dez::PhysicsObject> physics_, const std::string& name_)
     : physics(std::move(physics_)), name(name_) {
     gravity::registerBody(this);
+}
+void CelestialBody::tick(float delta) {
+    // assume gravity.gravitateNewtonian is already called
+    // we can't call it here because we don't have access to the list of all other objects
+    physics->core.applyAcceleration(gravity.lastAcceleration, delta);
+    dez::manager::tickObject(dez::manager::managedObject(physics.get()), delta);
 }
 
 // == ENGINE ==
