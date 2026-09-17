@@ -12,6 +12,7 @@ int main(int, char**) {
     renderer.enableXZClue(true);
     renderer.xzclue.spacing = 2.0f;
     renderer.xzclue.slices = 20;
+    auto clock = dor::Clock(system);
 
     auto camera = dez::Camera({-5.0f, 5.0f, 5.0f});
     camera.setTarget({0.0f, 0.0f, 0.0f});
@@ -42,11 +43,11 @@ int main(int, char**) {
             camera.lookAround(-dez::input::getAxis(KEY_F, KEY_H) * CAM_LOOK_SPEED * delta,
                               dez::input::getAxis(KEY_G, KEY_T) * CAM_LOOK_SPEED * delta);
 
-            system.tick(delta);
-
             auto inVec = dez::input::getVector3(KEY_LEFT, KEY_RIGHT, KEY_RIGHT_SHIFT, KEY_KP_1,
                                                 KEY_DOWN, KEY_UP);
             explorer->engine.setMaxThrust(inVec * 3e-9);
+
+            clock.tick(delta);
             return true;
         },
         [&]() {
