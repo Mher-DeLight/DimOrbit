@@ -48,7 +48,6 @@ int main(int, char**) {
             explorer->engine.setMaxThrust(inVec * 3e-9);
 
             clock.tick(delta);
-            dez::logger::flushLog(clock.time.getUTCTime());
             return true;
         },
         [&]() {
@@ -64,6 +63,8 @@ int main(int, char**) {
 
                 renderer.renderName(*explorer.get(), RED);
                 renderer.draw2DLabel(clock.time.getUTCTime(), dez::Vec2{0.0f, 0.0f});
+                renderer.draw2DLabel("Fuel: " + std::to_string(explorer->fuelTank.fuel()),
+                                     dez::Vec2{0.0f, 30.0f});
                 return 0;
             });
 
