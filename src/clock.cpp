@@ -89,13 +89,22 @@ bool Clock::hasSystem() {
 void Clock::setSystem(CelestialSystem& newsystem) {
     system = newsystem;
 }
+void Clock::setSpeedScale(float newscale) {
+    speedScale = newscale;
+}
+void Clock::speedUp(float amount) {
+    speedScale += amount;
+}
+void Clock::slowDown(float amount) {
+    speedScale -= amount;
+}
 
 Clock::Clock(CelestialSystem& startSystem) {
     system = startSystem;
 }
 
 void Clock::tick(float delta) {
-    int ticks = time.tick(delta);
+    int ticks = time.tick(delta * speedScale);
     for (int i = 0; i < ticks; i++) {
         getSystem().tick(delta);
     }

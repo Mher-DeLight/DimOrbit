@@ -47,6 +47,9 @@ struct Clock {
     CelestialSystem& getSystem(const std::string& errormsg = "");
     bool hasSystem();
     void setSystem(CelestialSystem& newsystem);
+    void setSpeedScale(float newscale);
+    void speedUp(float amount);
+    void slowDown(float amount);
 
     // actions
     void tick(float delta);
