@@ -6,7 +6,7 @@
 namespace DimOrbit {
 
 struct Time {
-    void tick(float delta);
+    int tick(float delta);
 
     int hour() const;
     int minute() const;
@@ -41,6 +41,7 @@ private:
 struct Clock {
     std::optional<std::reference_wrapper<CelestialSystem>> system;
     float speedScale = 1.0; // single precision is enough i think
+    Time time;
 
     // configuration
     CelestialSystem& getSystem(const std::string& errormsg = "");

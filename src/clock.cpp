@@ -62,12 +62,15 @@ Time& Time::operator-=(int mss) {
     return *this;
 }
 
-void Time::tick(float delta) {
+int Time::tick(float delta) {
+    int ticks = 0;
     fractionAccum += delta;
-    while (fractionAccum * 1000 > 1.0f) {
+    while (fractionAccum * 1000.0f > 1.0f) {
         ms++;
-        fractionAccum -= (1 / 1000);
+        ticks++;
+        fractionAccum -= (1.0f / 1000.0f);
     }
+    return ticks;
 }
 
 // == CLOCK ==
@@ -92,7 +95,10 @@ Clock::Clock(CelestialSystem& startSystem) {
 }
 
 void Clock::tick(float delta) {
-    getSystem().tick(delta);
+    int ticks = time.tick(delta);
+    for (int i = 0; i < ticks; i++) {
+        getSystem().tick(delta);
+    }
 }
 
 } // namespace DimOrbit
