@@ -62,7 +62,7 @@ int main(int, char**) {
                     return 0;
                 });
 
-                renderer.renderLabel(*explorer.get(), RED);
+                renderer.renderName(*explorer.get(), RED);
                 return 0;
             });
 

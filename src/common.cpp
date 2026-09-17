@@ -120,7 +120,7 @@ int Renderer::doin3d(dez::Camera& camera, std::function<int()> func) {
 void Renderer::displayVector(const dez::Vec3& vector, const dez::Vec3& origin, const Color& color) {
     DrawLine3D(origin, origin + vector, color);
 }
-void Renderer::renderLabels(const CelestialSystem& csystem, const Color& color) {
+void Renderer::renderNames(const CelestialSystem& csystem, const Color& color) {
     if (!mainCamera.has_value())
         throw std::runtime_error("DimOrbit: cannot render labels without camera");
 
@@ -139,7 +139,7 @@ void Renderer::renderLabels(const CelestialSystem& csystem, const Color& color) 
                 Vector3Normalize(mainCamera.value().get().direction));
             if (dot > 0.0f)
                 continue;
-            renderLabel(*body, color);
+            renderName(*body, color);
         }
     }
     for (auto& bscpcraft : csystem.basicSpacecrafts) {
@@ -151,29 +151,32 @@ void Renderer::renderLabels(const CelestialSystem& csystem, const Color& color) 
                 Vector3Normalize(mainCamera.value().get().direction));
             if (dot > 0.0f)
                 continue;
-            renderLabel(*body.get(), color);
+            renderName(*body.get(), color);
         }
     }
 }
-void Renderer::renderLabel(const CelestialBody& body, const Color& color) {
+void Renderer::renderName(const CelestialBody& body, const Color& color) {
+    renderLabel(body.name, Vec3{
+                               body.physics->transform.position.x,
+                               body.physics->transform.position.y + body.physics->collision.radius,
+                               body.physics->transform.position.z,
+                           });
+}
+void Renderer::renderName(const BasicSpacecraft& body, const Color& color) {
+    renderName(*body.body.get(), color);
+}
+void Renderer::renderLabel(const std::string& text, const Vec3& position, const Color& color,
+                           int fontSize) {
     using Vec2 = dez::Vec2;
-    float dot =
-        Vector3DotProduct(Vector3Normalize(Vector3Subtract(mainCamera.value().get().position,
-                                                           body.physics->transform.position)),
-                          Vector3Normalize(mainCamera.value().get().direction));
+    float dot = Vector3DotProduct(
+        Vector3Normalize(Vector3Subtract(mainCamera.value().get().position, position)),
+        Vector3Normalize(mainCamera.value().get().direction));
     if (dot > 0.0f)
         return;
-    const Vec2 labPosition =
-        GetWorldToScreen(Vector3{body.physics->transform.position.x,
-                                 body.physics->collision.center.y + body.physics->collision.radius,
-                                 body.physics->transform.position.z},
-                         mainCamera.value().get());
+    const Vec2 labPosition = GetWorldToScreen(position, mainCamera.value().get());
 
-    DrawText(body.name.c_str(), static_cast<int>(labPosition.x), static_cast<int>(labPosition.y),
-             20, color);
-}
-void Renderer::renderLabel(const BasicSpacecraft& body, const Color& color) {
-    renderLabel(*body.body.get(), color);
+    DrawText(text.c_str(), static_cast<int>(labPosition.x), static_cast<int>(labPosition.y),
+             fontSize, color);
 }
 
 void Renderer::render(const CelestialSystem& csystem) const {
