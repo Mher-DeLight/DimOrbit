@@ -98,6 +98,23 @@ void Clock::speedUp(float amount) {
 void Clock::slowDown(float amount) {
     speedScale -= amount;
 }
+void Clock::start() {
+    if (isRunning())
+        return;
+    speedScale = ssAccum;
+}
+void Clock::stop() {
+    if (!isRunning())
+        return;
+    ssAccum = speedScale;
+    speedScale = 0.0f;
+}
+bool Clock::isRunning() const {
+    return speedScale != 0.0f;
+}
+uint64_t Clock::getTime() const {
+    return time.time();
+}
 
 Clock::Clock(CelestialSystem& startSystem) {
     system = startSystem;

@@ -50,6 +50,10 @@ struct Clock {
     void setSpeedScale(float newscale);
     void speedUp(float amount);
     void slowDown(float amount);
+    bool isRunning() const;
+    void stop();
+    void start();
+    uint64_t getTime() const;
 
     // actions
     void tick(float delta);
@@ -57,6 +61,9 @@ struct Clock {
     // constructors
     Clock() = default;
     Clock(CelestialSystem& startSystem);
+
+private:
+    float ssAccum = 1.0f;
 };
 
 }; // namespace DimOrbit
