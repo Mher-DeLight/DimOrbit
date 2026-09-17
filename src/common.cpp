@@ -225,17 +225,25 @@ bool Renderer::hasAttribute(const CelestialBody& object, int attribute) const {
 }
 
 // == GRAVITY BODY ==
-void CelestialBody::beginOrbit(const CelestialBody& other, double altitude, double inclination) {
+void CelestialBody::beginOrbit(const CelestialBody& other, double altitude, double inclination,
+                               double completeness) {
+    const double alteredCompleteness = completeness + (PI);
     const auto& otherPhysics = other.physics->core;
     const double orbitalRadius = static_cast<double>(other.physics->collision.radius) + altitude;
     const double orbitalSpeed = std::sqrt(gravity::G * otherPhysics.mass / orbitalRadius);
     const float radius = static_cast<float>(orbitalRadius);
     const float angle = static_cast<float>(inclination);
+    Vec3& position = physics->transform.position;
+    const Vec3 dir = Vector3Normalize(otherPhysics.transform().position - position);
+    const Vec3 right = Vector3Normalize(Vector3CrossProduct(dir, Vec3::UP));
+    const Vec3 up = Vector3Normalize(Vector3CrossProduct(right, dir));
 
-    physics->transform.position = otherPhysics.transform().position + dez::Vec3{radius, 0.0f, 0.0f};
-    physics->core.setVelocity(otherPhysics.velocity +
-                              dez::Vec3{0.0f, static_cast<float>(orbitalSpeed * std::sin(angle)),
-                                        static_cast<float>(orbitalSpeed * std::cos(angle))});
+    position = Vector3RotateByAxisAngle(dir * radius, up, alteredCompleteness);
+
+    physics->core.setVelocity(Vector3RotateByAxisAngle(
+        otherPhysics.velocity + dez::Vec3{0.0f, static_cast<float>(orbitalSpeed * std::sin(angle)),
+                                          static_cast<float>(orbitalSpeed * std::cos(angle))},
+        up, alteredCompleteness));
 }
 CelestialBody::CelestialBody(uq<dez::PhysicsObject> physics_, const std::string& name_)
     : physics(std::move(physics_)), name(name_) {
