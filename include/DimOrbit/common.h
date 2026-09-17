@@ -190,6 +190,8 @@ struct Renderer {
     void renderName(const BasicSpacecraft& body, const Color& color = RED);
     void renderLabel(const std::string& text, const Vec3& position, const Color& color = RED,
                      int fontSize = 20);
+    void draw2DLabel(const std::string& text, const dez::Vec2& position, const Color& color = BLUE,
+                     int fontSize = 30);
 
     void render(const CelestialSystem& csystem) const;
 

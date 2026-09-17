@@ -64,6 +64,7 @@ int main(int, char**) {
                 });
 
                 renderer.renderName(*explorer.get(), RED);
+                renderer.draw2DLabel(clock.time.getUTCTime(), dez::Vec2{0.0f, 0.0f});
                 return 0;
             });
 

@@ -178,6 +178,11 @@ void Renderer::renderLabel(const std::string& text, const Vec3& position, const 
     DrawText(text.c_str(), static_cast<int>(labPosition.x), static_cast<int>(labPosition.y),
              fontSize, color);
 }
+void Renderer::draw2DLabel(const std::string& text, const dez::Vec2& position, const Color& color,
+                           int fontSize) {
+    DrawText(text.c_str(), static_cast<int>(position.x), static_cast<int>(position.y), fontSize,
+             color);
+}
 
 void Renderer::render(const CelestialSystem& csystem) const {
     if (isXZClueEnabled()) {
