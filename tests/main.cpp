@@ -13,7 +13,7 @@ int main(int, char**) {
     renderer.xzclue.spacing = 2.0f;
     renderer.xzclue.slices = 20;
     auto clock = dor::Clock(system);
-    clock.setSpeedScale(0.1f);
+    clock.setSpeedScale(1.0f);
 
     auto camera = dez::Camera({-5.0f, 5.0f, 5.0f});
     camera.setTarget({0.0f, 0.0f, 0.0f});
@@ -49,6 +49,7 @@ int main(int, char**) {
             explorer->engine.setMaxThrust(inVec * 3e-9);
 
             clock.tick(delta);
+            dez::logger::flushLog(clock.time.getUTCTime());
             return true;
         },
         [&]() {

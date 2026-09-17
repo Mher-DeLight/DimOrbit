@@ -13,6 +13,7 @@ struct Time {
     int second() const;
     int millisecond() const;
     uint64_t time() const;
+    std::string getUTCTime() const;
 
     Time& advanceMs(int amount);
     Time& advanceSec(int amount);
@@ -35,7 +36,7 @@ struct Time {
 
 private:
     uint64_t ms = 0;
-    float fractionAccum = 0.0;
+    double fractionAccum = 0.0;
 };
 
 struct Clock {

@@ -1,4 +1,5 @@
 #include "../include/DimOrbit/clock.h"
+#include <format>
 
 namespace DimOrbit {
 
@@ -17,6 +18,11 @@ int Time::minute() const {
 }
 int Time::hour() const {
     return (ms / 3'600'000) % 24;
+}
+std::string Time::getUTCTime() const {
+    return std::string(std::format("{:02}", hour()) + ":" + std::format("{:02}", minute()) + ":" +
+                       std::format("{:02}", second()) + ":" + std::format("{:03}", millisecond()) +
+                       "UTC");
 }
 
 Time& Time::advanceMs(int amount) {
@@ -65,7 +71,7 @@ Time& Time::operator-=(int mss) {
 int Time::tick(float delta) {
     int ticks = 0;
     fractionAccum += delta;
-    while (fractionAccum * 1000.0f > 1.0f) {
+    while (fractionAccum >= 1.0f / 1000.0f) {
         ms++;
         ticks++;
         fractionAccum -= (1.0f / 1000.0f);
