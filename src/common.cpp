@@ -1,5 +1,4 @@
 #include "../include/DimOrbit/common.h"
-#include "../include/DimOrbit/gravity.h"
 #include <cmath>
 #include <iostream>
 
@@ -247,9 +246,7 @@ void CelestialBody::beginOrbit(const CelestialBody& other, double altitude, doub
         up, alteredCompleteness));
 }
 CelestialBody::CelestialBody(uq<dez::PhysicsObject> physics_, const std::string& name_)
-    : physics(std::move(physics_)), name(name_) {
-    gravity::registerBody(this);
-}
+    : physics(std::move(physics_)), name(name_) {}
 void CelestialBody::tick(float delta) {
     // assume gravity.gravitateNewtonian is already called
     // we can't call it here because we don't have access to the list of all other objects

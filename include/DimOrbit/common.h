@@ -196,3 +196,6 @@ struct Renderer {
 };
 
 } // namespace DimOrbit
+namespace DimOrbit::gravity {
+inline const double G = 39.4784; // N*(m^2)/(kg^2)
+}
