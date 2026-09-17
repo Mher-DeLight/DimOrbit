@@ -129,7 +129,8 @@ Clock::Clock(CelestialSystem& startSystem) {
 void Clock::tick(float delta) {
     int ticks = time.tick(delta * speedScale);
     for (int i = 0; i < ticks; i++) {
-        getSystem().tick(delta);
+        // we tick by 1ms because ticks returns approximately the amount of milliseconds in delta
+        getSystem().tick(0.001f);
     }
 }
 
