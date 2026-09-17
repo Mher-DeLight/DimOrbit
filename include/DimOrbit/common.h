@@ -186,6 +186,8 @@ struct Renderer {
     void displayVector(const dez::Vec3& vector, const dez::Vec3& origin,
                        const Color& color = PURPLE);
     void renderLabels(const CelestialSystem& csystem, const Color& color = RED);
+    void renderLabel(const CelestialBody& body, const Color& color = RED);
+    void renderLabel(const BasicSpacecraft& body, const Color& color = RED);
 
     void render(const CelestialSystem& csystem) const;
 

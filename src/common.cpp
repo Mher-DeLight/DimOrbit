@@ -140,14 +140,7 @@ void Renderer::renderLabels(const CelestialSystem& csystem, const Color& color) 
                 Vector3Normalize(mainCamera.value().get().direction));
             if (dot > 0.0f)
                 continue;
-            nameLabels.push_back({
-                body->name,
-                GetWorldToScreen(
-                    Vector3{body->physics->transform.position.x,
-                            body->physics->collision.center.y + body->physics->collision.radius,
-                            body->physics->transform.position.z},
-                    mainCamera.value().get()),
-            });
+            renderLabel(*body, color);
         }
     }
     for (auto& bscpcraft : csystem.basicSpacecrafts) {
@@ -159,21 +152,29 @@ void Renderer::renderLabels(const CelestialSystem& csystem, const Color& color) 
                 Vector3Normalize(mainCamera.value().get().direction));
             if (dot > 0.0f)
                 continue;
-            nameLabels.push_back({
-                body->name,
-                GetWorldToScreen(
-                    Vector3{body->physics->transform.position.x,
-                            body->physics->collision.center.y + body->physics->collision.radius,
-                            body->physics->transform.position.z},
-                    mainCamera.value().get()),
-            });
+            renderLabel(*body.get(), color);
         }
     }
+}
+void Renderer::renderLabel(const CelestialBody& body, const Color& color) {
+    using Vec2 = dez::Vec2;
+    float dot =
+        Vector3DotProduct(Vector3Normalize(Vector3Subtract(mainCamera.value().get().position,
+                                                           body.physics->transform.position)),
+                          Vector3Normalize(mainCamera.value().get().direction));
+    if (dot > 0.0f)
+        return;
+    const Vec2 labPosition =
+        GetWorldToScreen(Vector3{body.physics->transform.position.x,
+                                 body.physics->collision.center.y + body.physics->collision.radius,
+                                 body.physics->transform.position.z},
+                         mainCamera.value().get());
 
-    for (const auto& label : nameLabels) {
-        DrawText(label.text.c_str(), static_cast<int>(label.position.x),
-                 static_cast<int>(label.position.y), 20, color);
-    }
+    DrawText(body.name.c_str(), static_cast<int>(labPosition.x), static_cast<int>(labPosition.y),
+             20, color);
+}
+void Renderer::renderLabel(const BasicSpacecraft& body, const Color& color) {
+    renderLabel(*body.body.get(), color);
 }
 
 void Renderer::render(const CelestialSystem& csystem) const {

@@ -29,7 +29,6 @@ int main(int, char**) {
     explorer->engine.start();
     explorer->engine.setThrottle(0.9);
     explorer->body->beginOrbit(*sun.get(), 5.0f, 0.0f);
-    renderer.addAttribute(*explorer->body.get(), dor::RENATR_SHOW_NAME);
 
     constexpr float CAM_SPEED = 15.0f;
     constexpr float CAM_LOOK_SPEED = 2.0f;
@@ -61,7 +60,7 @@ int main(int, char**) {
                     return 0;
                 });
 
-                renderer.renderLabels(system, RED);
+                renderer.renderLabel(*explorer.get(), RED);
                 return 0;
             });
 
