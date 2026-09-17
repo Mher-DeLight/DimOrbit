@@ -21,6 +21,10 @@ int Time::hour() const {
 }
 std::string Time::getUTCTime() const {
     return std::string(std::format("{:02}", hour()) + ":" + std::format("{:02}", minute()) + ":" +
+                       std::format("{:02}", second()) + "UTC");
+}
+std::string Time::getUTCTime_ms() const {
+    return std::string(std::format("{:02}", hour()) + ":" + std::format("{:02}", minute()) + ":" +
                        std::format("{:02}", second()) + ":" + std::format("{:03}", millisecond()) +
                        "UTC");
 }

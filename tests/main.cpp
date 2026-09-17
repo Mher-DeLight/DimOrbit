@@ -13,7 +13,6 @@ int main(int, char**) {
     renderer.xzclue.spacing = 2.0f;
     renderer.xzclue.slices = 20;
     auto clock = dor::Clock(system);
-    clock.setSpeedScale(1.0f);
 
     auto camera = dez::Camera({-5.0f, 5.0f, 5.0f});
     camera.setTarget({0.0f, 0.0f, 0.0f});

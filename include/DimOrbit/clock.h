@@ -14,6 +14,7 @@ struct Time {
     int millisecond() const;
     uint64_t time() const;
     std::string getUTCTime() const;
+    std::string getUTCTime_ms() const;
 
     Time& advanceMs(int amount);
     Time& advanceSec(int amount);
