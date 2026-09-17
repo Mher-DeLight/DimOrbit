@@ -1,8 +1,42 @@
 #pragma once
 #include "common.h"
+#include <cstdint>
 #include <optional>
 
 namespace DimOrbit {
+
+struct Time {
+    void tick(float delta);
+
+    int hour() const;
+    int minute() const;
+    int second() const;
+    int millisecond() const;
+    uint64_t time() const;
+
+    Time& advanceMs(int amount);
+    Time& advanceSec(int amount);
+    Time& advanceMin(int amount);
+    Time& advanceHr(int amount);
+    Time& setTime(Time& newtime);
+
+    Time operator+(const Time& other);
+    Time operator-(const Time& other);
+    Time operator+(int mss);
+    Time operator-(int mss);
+    Time& operator+=(int mss);
+    Time& operator-=(int mss);
+
+    Time() = default;
+    Time(uint64_t ms_, double fractionAccum_ = 0.0) {
+        ms = ms_;
+        fractionAccum = fractionAccum_;
+    }
+
+private:
+    uint64_t ms = 0;
+    float fractionAccum = 0.0;
+};
 
 struct Clock {
     std::optional<std::reference_wrapper<CelestialSystem>> system;
