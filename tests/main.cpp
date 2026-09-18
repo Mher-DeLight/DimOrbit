@@ -63,6 +63,8 @@ int main(int, char**) {
                 });
 
                 renderer.renderName(*explorer.get(), RED);
+                renderer.renderName(*sun.get(), GREEN);
+
                 renderer.draw2DLabel(clock.time.getUTCTime(), dez::Vec2{0.0f, 0.0f});
                 renderer.draw2DLabel("Fuel: " + std::to_string(explorer->fuelTank.fuel()),
                                      dez::Vec2{0.0f, 30.0f});

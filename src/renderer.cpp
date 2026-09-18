@@ -77,11 +77,13 @@ void Renderer::renderNames(const CelestialSystem& csystem, const Color& color) {
     }
 }
 void Renderer::renderName(const CelestialBody& body, const Color& color) {
-    renderLabel(body.name, Vec3{
-                               body.physics->transform.position.x,
-                               body.physics->transform.position.y + body.physics->collision.radius,
-                               body.physics->transform.position.z,
-                           });
+    renderLabel(body.name,
+                Vec3{
+                    body.physics->transform.position.x,
+                    body.physics->transform.position.y + body.physics->collision.radius,
+                    body.physics->transform.position.z,
+                },
+                color);
 }
 void Renderer::renderName(const BasicSpacecraft& body, const Color& color) {
     renderName(*body.body.get(), color);
