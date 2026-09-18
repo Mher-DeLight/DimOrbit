@@ -21,6 +21,7 @@ target_link_libraries(DimOrbit
 )
 
 if (BUILD_TESTS)
-    add_executable(DimOrbit_test tests/main.cpp)
+    add_executable(DimOrbit_test tests/main.cpp
+        src/renderer.cpp)
     target_link_libraries(DimOrbit_test PRIVATE DimOrbit)
 endif()

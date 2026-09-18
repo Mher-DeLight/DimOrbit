@@ -1,6 +1,7 @@
 #include <DimOrbit/DimOrbit.h>
 
 int main(int, char**) {
+    // todo: make the engine consume fuel proportional to its thrust
     namespace dez = DimEngineZ;
     namespace dor = DimOrbit;
     using Vec3 = dez::Vec3;
