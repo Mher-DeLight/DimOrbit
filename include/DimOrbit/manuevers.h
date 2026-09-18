@@ -2,10 +2,11 @@
 #include "clock.h"
 #include "common.h"
 
-namespace DimOrbit::manuevers {
+namespace DimOrbit::manuever {
 
 struct DeltaV {
     Vec3 velocity = Vec3::ZERO;
+    DeltaV(const Vec3& vel) : velocity(vel) {}
 };
 struct Manuever {
     virtual bool shouldApply(BasicSpacecraft& craft, CelestialSystem& system,
@@ -30,6 +31,9 @@ struct TimeManuever : public Manuever {
     void apply(BasicSpacecraft& craft, CelestialSystem& system, Clock& clock) override {
         craft.engine.applyMaxThrust(deltaV.velocity);
     }
+
+    TimeManuever(const Time& applicationTime_, const DeltaV& deltaV_)
+        : applicationTime(applicationTime_), deltaV(deltaV_) {}
 };
 
-}; // namespace DimOrbit::manuevers
+}; // namespace DimOrbit::manuever
