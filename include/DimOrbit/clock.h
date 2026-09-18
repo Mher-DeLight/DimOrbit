@@ -1,6 +1,7 @@
 #pragma once
 #include "common.h"
 #include <cstdint>
+#include <functional>
 #include <optional>
 
 namespace DimOrbit {
@@ -40,10 +41,16 @@ private:
     double fractionAccum = 0.0;
 };
 
+struct ClockEvent {
+    std::function<bool()> condition;
+    std::function<void()> action;
+};
+
 struct Clock {
     std::optional<std::reference_wrapper<CelestialSystem>> system;
     float speedScale = 1.0; // single precision is enough i think
     Time time;
+    std::vector<ClockEvent> binds;
 
     // configuration
     CelestialSystem& getSystem(const std::string& errormsg = "");
@@ -59,6 +66,8 @@ struct Clock {
 
     // actions
     void tick(float delta);
+    void bind(const ClockEvent& event);
+    void tickBinds();
 
     // constructors
     Clock() = default;
