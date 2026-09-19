@@ -1,4 +1,5 @@
 #include "../include/DimOrbit/common.h"
+#include "../include/DimOrbit/spacecraft.h"
 #include <cmath>
 #include <iostream>
 
@@ -181,17 +182,6 @@ double FuelTank::maxFuel() const {
 }
 bool FuelTank::isEmpty() const {
     return fuel() <= 0.0;
-}
-
-// == BASIC SPACECRAFT ==
-void BasicSpacecraft::tick(float delta) {
-    if (engine.maxThrust.x == 0 && engine.maxThrust.y == 0 && engine.maxThrust.z == 0)
-        return; // if there is no thrust, movement will be handled by gravitate_Newtonian
-    if (fuelTank.isEmpty())
-        return;
-
-    physics->core.applyForce(engine.thrust(), delta);
-    fuelTank.consumeFuel(fuelElapseRate * delta);
 }
 
 } // namespace DimOrbit

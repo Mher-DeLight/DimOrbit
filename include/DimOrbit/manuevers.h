@@ -9,14 +9,8 @@ struct DeltaV {
     DeltaV(const Vec3& vel) : velocity(vel) {}
 };
 struct Manuever {
-    virtual bool shouldApply(BasicSpacecraft& craft, CelestialSystem& system,
-                             Clock& clock) const = 0;
-    virtual void apply(BasicSpacecraft& craft, CelestialSystem& system, Clock& clock) = 0;
-    virtual void tick(BasicSpacecraft& craft, CelestialSystem& system, Clock& clock) {
-        if (shouldApply(craft, system, clock)) {
-            apply(craft, system, clock);
-        }
-    }
+    virtual bool shouldApply(BasicSpacecraft& craft, Clock& clock) const = 0;
+    virtual void apply(BasicSpacecraft& craft, Clock& clock) = 0;
 
     virtual ~Manuever() = default;
 };
@@ -25,12 +19,8 @@ struct TimeManuever : public Manuever {
     Time applicationTime;
     DeltaV deltaV;
 
-    bool shouldApply(BasicSpacecraft& craft, CelestialSystem& system, Clock& clock) const override {
-        return applicationTime.time() >= clock.time.time()
-    }
-    void apply(BasicSpacecraft& craft, CelestialSystem& system, Clock& clock) override {
-        craft.engine.applyMaxThrust(deltaV.velocity);
-    }
+    bool shouldApply(BasicSpacecraft& craft, Clock& clock) const override;
+    void apply(BasicSpacecraft& craft, Clock& clock) override;
 
     TimeManuever(const Time& applicationTime_, const DeltaV& deltaV_)
         : applicationTime(applicationTime_), deltaV(deltaV_) {}

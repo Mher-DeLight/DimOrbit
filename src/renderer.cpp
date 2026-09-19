@@ -1,4 +1,5 @@
 #include "../include/DimOrbit/renderer.h"
+#include "../include/DimOrbit/spacecraft.h"
 
 namespace DimOrbit {
 void Renderer::begin(const Color& bgColor) {
