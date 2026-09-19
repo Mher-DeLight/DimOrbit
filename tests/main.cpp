@@ -1,27 +1,33 @@
 #include <DimOrbit/DimOrbit.h>
+// todo: make the engine consume fuel proportional to its thrust
 
 int main(int, char**) {
-    // todo: make the engine consume fuel proportional to its thrust
+    // setup
     namespace dez = DimEngineZ;
     namespace dor = DimOrbit;
     using Vec3 = dez::Vec3;
-
     dez::manager::init(1000, 800, "Newtonian Gravity Simulation");
 
+    // initialization
     auto system = dor::CelestialSystem();
+
     auto renderer = dor::Renderer();
     renderer.enableXZClue(true);
     renderer.xzclue.spacing = 2.0f;
     renderer.xzclue.slices = 20;
+
     auto clock = dor::Clock(system);
-    clock.bind({[&]() { return clock.time.time() == 1000; },
-                [&]() { dez::logger::flushLog("One second has passed."); }});
 
     auto camera = dez::Camera({-5.0f, 5.0f, 5.0f});
     camera.setTarget({0.0f, 0.0f, 0.0f});
 
-    auto sun = system.addBody(
-        dor::BodyOptions{.name = "Sun", .radius = 5.0f, .color = YELLOW, .mass = 1.0f});
+    // objects
+    auto sun = system.addBody(dor::BodyOptions{
+        .name = "Sun",
+        .radius = 5.0f,
+        .color = YELLOW,
+        .mass = 1.0f,
+    });
     auto explorer = system.addSpacecraft(dor::BasicSpacecraftOptions{
         .name = "Explorer",
         .radius = 0.1f,
@@ -35,13 +41,7 @@ int main(int, char**) {
     explorer->body->beginOrbit(*sun.get(), 5.0f, 0.0f);
     explorer->createTimeManeuver(dor::Time(5000), dor::maneuver::DeltaV({5e-9f, 0.0f, 0.0f}),
                                  clock);
-    explorer->scheduleAction(
-        dor::Time(6000),
-        [&]() {
-            explorer->engine.stop();
-            dez::logger::flushLog("stop");
-        },
-        clock);
+    explorer->scheduleAction(dor::Time(6000), [&]() { explorer->engine.stop(); }, clock);
 
     constexpr float CAM_SPEED = 15.0f;
     constexpr float CAM_LOOK_SPEED = 2.0f;
