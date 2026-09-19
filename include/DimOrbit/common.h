@@ -91,7 +91,7 @@ struct Engine {
     dez::Vec3 maxThrust = dez::Vec3::ZERO;
     double throttle = 1.0;
 
-    void start();
+    void start(double initthrottle = 1.0);
 
     void setThrottle(double newthrottle);
     double getThrottle() const;
@@ -100,6 +100,7 @@ struct Engine {
     dez::Vec3 thrust() const;
 
     void stop();
+    void restart(double initthrottle = 1.0);
 };
 struct FuelTank {
     double _fuel = 100.0;

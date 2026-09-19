@@ -36,18 +36,11 @@ int main(int, char**) {
         .mass = 1e-9,
         .fuelElapseRate = 2.5,
     });
-    explorer->engine.start();
-    explorer->engine.setThrottle(0.9);
+    explorer->engine.start(0.9);
     explorer->body->beginOrbit(*sun.get(), 5.0f, 0.0f);
     explorer->createTimeManeuver(dor::Time(5000), dor::maneuver::DeltaV({5e-9f, 0.0f, 0.0f}),
                                  clock);
-    explorer->scheduleAction(
-        dor::Time(6000),
-        [&]() {
-            explorer->engine.stop();
-            explorer->engine.start();
-        },
-        clock);
+    explorer->scheduleAction(dor::Time(6000), [&]() { explorer->engine.restart(1.0); }, clock);
 
     constexpr float CAM_SPEED = 15.0f;
     constexpr float CAM_LOOK_SPEED = 2.0f;

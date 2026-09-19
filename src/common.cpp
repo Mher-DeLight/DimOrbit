@@ -111,12 +111,17 @@ void CelestialBody::tick(float delta) {
 }
 
 // == ENGINE ==
-void Engine::start() {
+void Engine::start(double initthrottle) {
     isStarted = true;
+    setThrottle(initthrottle);
 }
 void Engine::stop() {
     maxThrust = dez::Vec3::ZERO;
     isStarted = false;
+}
+void Engine::restart(double initthrottle) {
+    stop();
+    start(initthrottle);
 }
 
 void Engine::applyMaxThrust(const dez::Vec3& amount) {
