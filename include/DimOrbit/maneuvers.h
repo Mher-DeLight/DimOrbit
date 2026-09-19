@@ -14,6 +14,17 @@ struct Maneuver {
 
     virtual ~Maneuver() = default;
 };
+struct ArbitraryTimeManeuver : public Maneuver {
+    Time applicationTime;
+    std::function<void()> action;
+    bool applied = false;
+
+    bool shouldApply(BasicSpacecraft& craft, Clock& clock) const override;
+    void apply(BasicSpacecraft& craft, Clock& clock) override;
+
+    ArbitraryTimeManeuver(const Time& applicationTime_, const std::function<void()> action_)
+        : applicationTime(applicationTime_), action(action_) {}
+};
 struct TimeManeuver : public Maneuver {
     // yes, i'm using inheritance. it's none of your business.
     Time applicationTime;

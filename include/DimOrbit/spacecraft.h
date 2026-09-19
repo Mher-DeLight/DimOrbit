@@ -2,6 +2,7 @@
 #include "clock.h"
 #include "common.h"
 #include "maneuvers.h"
+#include <functional>
 
 namespace DimOrbit {
 struct BasicSpacecraft {
@@ -38,5 +39,7 @@ struct BasicSpacecraft {
     // Maneuvers
     maneuver::TimeManeuver createTimeManeuver(const Time& time, const maneuver::DeltaV& deltaV,
                                               Clock& clock);
+    maneuver::ArbitraryTimeManeuver
+    scheduleAction(const Time& time, const std::function<void()> action, Clock& clock);
 };
 }; // namespace DimOrbit

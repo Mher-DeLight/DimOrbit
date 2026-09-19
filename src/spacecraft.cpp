@@ -25,5 +25,15 @@ maneuver::TimeManeuver BasicSpacecraft::createTimeManeuver(const Time& time,
 
     return *maneuver;
 }
+maneuver::ArbitraryTimeManeuver BasicSpacecraft::scheduleAction(const Time& time,
+                                                                const std::function<void()> action,
+                                                                Clock& clock) {
+    auto maneuver = std::make_shared<maneuver::ArbitraryTimeManeuver>(time, action);
+    clock.bind({
+        .condition = [this, maneuver, &clock]() { return maneuver->shouldApply(*this, clock); },
+        .action = [this, maneuver, &clock]() { maneuver->apply(*this, clock); },
+    });
+    return *maneuver;
+}
 
 } // namespace DimOrbit
