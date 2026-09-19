@@ -56,7 +56,7 @@ struct BasicSpacecraftOptions {
 
     double fuel = 100.0;
     double maxFuel = 100.0;
-    double fuelElapseRate = 2.5;
+    double specificImpulse = 2.5;
 };
 
 struct CelestialBody {
@@ -90,14 +90,21 @@ struct Engine {
     bool isStarted = false;
     dez::Vec3 maxThrust = dez::Vec3::ZERO;
     double throttle = 1.0;
+    double specificImpulse = 1.0e-9;
 
     void start(double initthrottle = 1.0);
 
+    // action
     void setThrottle(double newthrottle);
     double getThrottle() const;
     void applyMaxThrust(const dez::Vec3& amount);
     void setMaxThrust(const dez::Vec3& newthrust);
+
+    // getter/internal
     dez::Vec3 thrust() const;
+    double idealExhaustVelocity() const;
+    double effectiveExhaustVelocity() const;
+    double propellantFlowRate() const;
 
     void stop();
     void restart(double initthrottle = 1.0);
@@ -123,9 +130,10 @@ struct FuelTank {
 };
 
 } // namespace DimOrbit
-namespace DimOrbit::gravity {
-inline const double G = 39.4784; // N*(m^2)/(kg^2)
-}
+namespace DimOrbit::math {
+inline constexpr double G = 39.4784;  // N*(m^2)/(kg^2)
+inline constexpr double g0 = 9.80665; // s
+} // namespace DimOrbit::math
 namespace DimOrbit::RENATR {
 inline constexpr int SHOW_NAME = 1;
 }

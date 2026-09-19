@@ -15,7 +15,7 @@ Vec3 GravityCalculator::gravitateNewtonian(const Vec3& posSelf, const Vec3& posO
         return Vec3::ZERO;
 
     const double accelerationScale =
-        static_cast<double>(gravity::G * massOther / (dist * dist * dist));
+        static_cast<double>(math::G * massOther / (dist * dist * dist));
     lastAcceleration = diff * accelerationScale;
     return lastAcceleration;
 }
@@ -86,7 +86,7 @@ void CelestialBody::beginOrbit(const CelestialBody& other, double altitude, doub
     const double alteredCompleteness = completeness + (PI);
     const auto& otherPhysics = other.physics->core;
     const double orbitalRadius = static_cast<double>(other.physics->collision.radius) + altitude;
-    const double orbitalSpeed = std::sqrt(gravity::G * otherPhysics.mass / orbitalRadius);
+    const double orbitalSpeed = std::sqrt(math::G * otherPhysics.mass / orbitalRadius);
     const float radius = static_cast<float>(orbitalRadius);
     const float angle = static_cast<float>(inclination);
     Vec3& position = physics->transform.position;
@@ -142,6 +142,20 @@ double Engine::getThrottle() const {
 }
 dez::Vec3 Engine::thrust() const {
     return maxThrust * throttle;
+}
+
+double Engine::idealExhaustVelocity() const {
+    return specificImpulse * math::g0;
+}
+double Engine::effectiveExhaustVelocity() const {
+    return idealExhaustVelocity(); // currently assuming ideal conditions, might change later
+}
+double Engine::propellantFlowRate() const {
+    if (!isStarted)
+        return 0.0;
+
+    double amount = thrust().magnitude() / effectiveExhaustVelocity();
+    return amount;
 }
 
 // == FUEL TANK ==

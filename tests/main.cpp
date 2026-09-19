@@ -34,7 +34,7 @@ int main(int, char**) {
         .color = WHITE,
         .position = Vec3{20.0f, 0.0f, 0.0f},
         .mass = 1e-9,
-        .fuelElapseRate = 2.5,
+        .specificImpulse = 300.0,
     });
     explorer->engine.start(0.9);
     explorer->body->beginOrbit(*sun.get(), 5.0f, 0.0f);

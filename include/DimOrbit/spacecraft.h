@@ -9,7 +9,6 @@ struct BasicSpacecraft {
     uq<CelestialBody> body;
     dez::PhysicsObject* physics;
     FuelTank fuelTank;
-    double fuelElapseRate = 1.0f;
     dez::Vec3 thrust = dez::Vec3::ZERO;
     Engine engine;
 
@@ -29,7 +28,7 @@ struct BasicSpacecraft {
         body->physics->core.applyVelocity(options.velocity);
         body->physics->core.mass = options.mass;
         physics = body->physics.get();
-        fuelElapseRate = options.fuelElapseRate;
+        engine.specificImpulse = options.specificImpulse;
         fuelTank.setMaxFuel(options.maxFuel);
         fuelTank.setFuel(options.fuel);
         fuelTank.clampFuel();

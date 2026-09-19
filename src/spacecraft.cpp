@@ -10,7 +10,7 @@ void BasicSpacecraft::tick(float delta) {
         return;
 
     physics->core.applyForce(engine.thrust(), delta);
-    fuelTank.consumeFuel(fuelElapseRate * delta);
+    fuelTank.consumeFuel(delta * engine.propellantFlowRate());
 }
 
 maneuver::TimeManeuver BasicSpacecraft::createTimeManeuver(const Time& time,
