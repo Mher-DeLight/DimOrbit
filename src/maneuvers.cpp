@@ -3,9 +3,10 @@
 
 namespace DimOrbit::maneuver {
 bool TimeManeuver::shouldApply(BasicSpacecraft& craft, Clock& clock) const {
-    return applicationTime.time() >= clock.time.time();
+    return !applied && clock.time.time() >= applicationTime.time();
 }
 void TimeManeuver::apply(BasicSpacecraft& craft, Clock& clock) {
     craft.engine.applyMaxThrust(deltaV.velocity);
+    applied = true;
 }
 } // namespace DimOrbit::maneuver

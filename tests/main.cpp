@@ -28,11 +28,13 @@ int main(int, char**) {
         .color = WHITE,
         .position = Vec3{20.0f, 0.0f, 0.0f},
         .mass = 1e-9,
-        .fuelElapseRate = 2.5,
+        .fuelElapseRate = 10.0,
     });
     explorer->engine.start();
     explorer->engine.setThrottle(0.9);
     explorer->body->beginOrbit(*sun.get(), 5.0f, 0.0f);
+    explorer->createTimeManeuver(dor::Time(5000), dor::maneuver::DeltaV({5e-9f, 0.0f, 0.0f}),
+                                 clock);
 
     constexpr float CAM_SPEED = 15.0f;
     constexpr float CAM_LOOK_SPEED = 2.0f;
@@ -48,7 +50,7 @@ int main(int, char**) {
 
             auto inVec = dez::input::getVector3(KEY_LEFT, KEY_RIGHT, KEY_RIGHT_SHIFT, KEY_KP_1,
                                                 KEY_DOWN, KEY_UP);
-            explorer->engine.setMaxThrust(inVec * 3e-9);
+            explorer->engine.applyMaxThrust(inVec * 3e-9);
 
             clock.tick(delta);
             return true;

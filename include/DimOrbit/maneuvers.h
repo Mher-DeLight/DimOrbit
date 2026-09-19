@@ -18,6 +18,7 @@ struct TimeManeuver : public Maneuver {
     // yes, i'm using inheritance. it's none of your business.
     Time applicationTime;
     DeltaV deltaV;
+    bool applied = false;
 
     bool shouldApply(BasicSpacecraft& craft, Clock& clock) const override;
     void apply(BasicSpacecraft& craft, Clock& clock) override;
