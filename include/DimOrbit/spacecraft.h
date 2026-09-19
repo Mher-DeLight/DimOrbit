@@ -1,7 +1,7 @@
 #pragma once
 #include "clock.h"
 #include "common.h"
-#include "manuevers.h"
+#include "maneuvers.h"
 
 namespace DimOrbit {
 struct BasicSpacecraft {
@@ -35,8 +35,8 @@ struct BasicSpacecraft {
     }
     void tick(float delta);
 
-    // Manuevers
-    manuever::TimeManuever createTimeManuever(const Time& time, const manuever::DeltaV& deltaV,
+    // Maneuvers
+    maneuver::TimeManeuver createTimeManeuver(const Time& time, const maneuver::DeltaV& deltaV,
                                               Clock& clock);
 };
 }; // namespace DimOrbit

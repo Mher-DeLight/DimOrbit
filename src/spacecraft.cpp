@@ -13,17 +13,17 @@ void BasicSpacecraft::tick(float delta) {
     fuelTank.consumeFuel(fuelElapseRate * delta);
 }
 
-manuever::TimeManuever BasicSpacecraft::createTimeManuever(const Time& time,
-                                                           const manuever::DeltaV& deltaV,
+maneuver::TimeManeuver BasicSpacecraft::createTimeManeuver(const Time& time,
+                                                           const maneuver::DeltaV& deltaV,
                                                            Clock& clock) {
-    auto manuever = std::make_shared<manuever::TimeManuever>(time, deltaV);
+    auto maneuver = std::make_shared<maneuver::TimeManeuver>(time, deltaV);
 
     clock.bind({
-        .condition = [this, manuever, &clock]() { return manuever->shouldApply(*this, clock); },
-        .action = [this, manuever, &clock]() { manuever->apply(*this, clock); },
+        .condition = [this, maneuver, &clock]() { return maneuver->shouldApply(*this, clock); },
+        .action = [this, maneuver, &clock]() { maneuver->apply(*this, clock); },
     });
 
-    return *manuever;
+    return *maneuver;
 }
 
 } // namespace DimOrbit
