@@ -7,20 +7,32 @@
 namespace DimEngineZ {
 
 // == VEC3 ==
-float Vec3::magnitude() const {
-    return Vector3Length(vec);
+double Vec3::sqr_magnitude() const {
+    return (x * x) + (y * y) + (z * z);
 }
-Vector3 Vec3::normalize() const {
-    return Vector3Normalize(vec);
+double Vec3::magnitude() const {
+    return std::sqrt(sqr_magnitude());
 }
-const Vec3 Vec3::ZERO{0.0f, 0.0f, 0.0f};
-const Vec3 Vec3::ONE{1.0f, 1.0f, 1.0f};
-const Vec3 Vec3::UP{0.0f, 1.0f, 0.0f};
-const Vec3 Vec3::DOWN{0.0f, -1.0f, 0.0f};
-const Vec3 Vec3::LEFT{-1.0f, 0.0f, 0.0f};
-const Vec3 Vec3::RIGHT{1.0f, 0.0f, 0.0f};
-const Vec3 Vec3::FORWARD{0.0f, 0.0f, 1.0f};
-const Vec3 Vec3::BACKWARD{0.0f, 0.0f, -1.0f};
+Vec3 Vec3::normalized() const {
+    double mag = magnitude();
+    if (mag > 0.0) {
+        // depending on compiler options, dividing here first can be faster
+        double inv_mag = 1.0 / mag;
+        return Vec3{x * inv_mag, y * inv_mag, z * inv_mag};
+    }
+    return Vec3::ZERO;
+}
+bool Vec3::isZero() const {
+    return *this == Vec3::ZERO;
+}
+const Vec3 Vec3::ZERO{0.0, 0.0, 0.0};
+const Vec3 Vec3::ONE{1.0, 1.0, 1.0};
+const Vec3 Vec3::UP{0.0, 1.0, 0.0};
+const Vec3 Vec3::DOWN{0.0, -1.0, 0.0};
+const Vec3 Vec3::LEFT{-1.0, 0.0, 0.0};
+const Vec3 Vec3::RIGHT{1.0, 0.0, 0.0};
+const Vec3 Vec3::FORWARD{0.0, 0.0, 1.0};
+const Vec3 Vec3::BACKWARD{0.0, 0.0, -1.0};
 
 // == VEC2 ==
 float Vec2::magnitude() const {
@@ -43,39 +55,39 @@ float Transform::magnitude() const {
 float Transform::rotationMagnitude() const {
     return Vector3Length(rotation);
 }
-void Transform::rotateX(float amount) {
+void Transform::rotateX(double amount) {
     rotation.x += amount;
 }
-void Transform::rotateY(float amount) {
+void Transform::rotateY(double amount) {
     rotation.y += amount;
 }
-void Transform::rotateZ(float amount) {
+void Transform::rotateZ(double amount) {
     rotation.z += amount;
 }
 
 void Transform::move(const Vector3& displacement) {
     position += displacement;
 }
-void Transform::moveX(float amount) {
+void Transform::moveX(double amount) {
     position.x += amount;
 }
-void Transform::moveY(float amount) {
+void Transform::moveY(double amount) {
     position.y += amount;
 }
-void Transform::moveZ(float amount) {
+void Transform::moveZ(double amount) {
     position.z += amount;
 }
 
 void Transform::goTo(const Vector3& newposition) {
     position = newposition;
 }
-void Transform::goToX(float amount) {
+void Transform::goToX(double amount) {
     position.x = amount;
 }
-void Transform::goToY(float amount) {
+void Transform::goToY(double amount) {
     position.y = amount;
 }
-void Transform::goToZ(float amount) {
+void Transform::goToZ(double amount) {
     position.z = amount;
 }
 
@@ -95,11 +107,11 @@ void DrawObject::selfRegister() {
 void MovementObject::tick(float delta_) {
     transform().position += velocity * delta_;
 
-    auto applyDrag = [this, delta_](float& v) {
+    auto applyDrag = [this, delta_](double v) {
         if (v > 0.0f)
-            v = std::max(v - drag * delta_, 0.0f);
+            v = std::max(v - drag * delta_, 0.0);
         else if (v < 0.0f)
-            v = std::min(v + drag * delta_, 0.0f);
+            v = std::min(v + drag * delta_, 0.0);
     };
 
     applyDrag(velocity.x);
@@ -202,15 +214,15 @@ void Camera::move(const Vector3& amount) {
     position += amount;
     refreshTarget();
 }
-void Camera::moveX(float amount) {
+void Camera::moveX(double amount) {
     position.x += amount;
     refreshTarget();
 }
-void Camera::moveY(float amount) {
+void Camera::moveY(double amount) {
     position.y += amount;
     refreshTarget();
 }
-void Camera::moveZ(float amount) {
+void Camera::moveZ(double amount) {
     position.z += amount;
     refreshTarget();
 }
@@ -218,15 +230,15 @@ void Camera::goTo(const Vector3& amount) {
     position = amount;
     refreshTarget();
 }
-void Camera::goToX(float amount) {
+void Camera::goToX(double amount) {
     position.x = amount;
     refreshTarget();
 }
-void Camera::goToY(float amount) {
+void Camera::goToY(double amount) {
     position.y = amount;
     refreshTarget();
 }
-void Camera::goToZ(float amount) {
+void Camera::goToZ(double amount) {
     position.z = amount;
     refreshTarget();
 }

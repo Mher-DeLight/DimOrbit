@@ -11,55 +11,75 @@
 namespace DimEngineZ {
 
 struct Vec3 {
-private:
-    Vector3 vec;
+    double x;
+    double y;
+    double z;
 
-public:
-    float& x;
-    float& y;
-    float& z;
+    Vec3(double x_ = 0.0, double y_ = 0.0, double z_ = 0.0) : x(x_), y(y_), z(z_) {}
+    Vec3(const Vector3& vec) : x(vec.x), y(vec.y), z(vec.z) {}
+    Vec3(std::initializer_list<double> lst)
+        : x(*(lst.begin() + 0)), y(*(lst.begin() + 1)), z(*(lst.begin() + 2)) {}
+    Vec3(const Vec3& other) : x(other.x), y(other.y), z(other.z) {}
 
-    Vec3(float x_ = 0.0f, float y_ = 0.0f, float z_ = 0.0f)
-        : vec{x_, y_, z_}, x(vec.x), y(vec.y), z(vec.z) {}
-    Vec3(const Vector3& initvec) : vec(initvec), x(vec.x), y(vec.y), z(vec.z) {}
-    Vec3(std::initializer_list<float> lst)
-        : vec{*(lst.begin()), *(lst.begin() + 1), *(lst.begin() + 2)}, x(vec.x), y(vec.y),
-          z(vec.z) {}
-    Vec3(const Vec3& other) : vec(other.vec), x(vec.x), y(vec.y), z(vec.z) {}
+    double sqr_magnitude() const;
+    double magnitude() const;
+    bool isZero() const;
+    Vec3 normalized() const;
 
-    float magnitude() const;
-    Vector3 normalize() const;
-
-    Vec3 operator+(const Vec3& other) {
-        return Vec3(other.vec + vec);
+    Vec3 operator+(const Vec3& other) const {
+        return Vec3{x + other.x, y + other.y, z + other.z};
     }
-    Vec3 operator-(const Vec3& other) {
-        return Vec3(vec - other.vec);
+    Vec3 operator-(const Vec3& other) const {
+        return Vec3(x - other.x, y - other.y, z - other.z);
     }
-    Vec3 operator*(const Vec3& other) {
-        return Vec3(other.vec * vec);
+    Vec3 operator*(const Vec3& other) const {
+        return Vec3(x * other.x, y * other.y, z * other.z);
     }
-    Vec3 operator/(const Vec3& other) {
-        return Vec3(vec / other.vec);
+    Vec3 operator/(const Vec3& other) const {
+        return Vec3(x / other.x, y * other.y, z * other.z);
     }
-    Vec3 operator*(float scalar) {
-        return Vec3(vec * scalar);
+    Vec3 operator*(double scalar) const {
+        return Vec3(x * scalar, y * scalar, z * scalar);
     }
-    Vec3 operator/(float scalar) {
-        return Vec3(vec / scalar);
+    Vec3 operator*(float scalar) const {
+        return Vec3(x * scalar, y * scalar, z * scalar);
+    }
+    Vec3 operator*(int scalar) const {
+        float sc = scalar;
+        return Vec3(x * sc, y * sc, z * sc);
+    }
+    Vec3 operator/(double scalar) const {
+        double inv = 1.0 / scalar;
+        return (*this) * inv;
     }
 
     Vec3& operator=(const Vec3& other) {
-        vec = other.vec;
+        x = other.x;
+        y = other.y;
+        z = other.z;
         return *this;
     }
     Vec3 operator+=(const Vec3& other) {
-        vec += other.vec;
+        x += other.x;
+        y += other.y;
+        z += other.z;
         return *this;
     }
 
-    operator const Vector3&() const {
-        return vec;
+    bool operator==(const Vec3& other) const {
+        return (x == other.x) && (y == other.y) && (z == other.z);
+    }
+    operator bool() const {
+        return !isZero();
+    }
+    bool operator!() const {
+        return isZero();
+    }
+
+    operator Vector3() const {
+#define fl(x) static_cast<float>(x)
+        return Vector3{fl(x), fl(y), fl(z)};
+#undef fl
     }
 
     static const Vec3 ZERO;
@@ -136,22 +156,22 @@ struct Transform {
     float magnitude() const;
     float rotationMagnitude() const;
 
-    void rotateX(float amount);
-    void rotateY(float amount);
-    void rotateZ(float amount);
+    void rotateX(double amount);
+    void rotateY(double amount);
+    void rotateZ(double amount);
 
     void move(const Vector3& displacement);
-    void moveX(float amount);
-    void moveY(float amount);
-    void moveZ(float amount);
+    void moveX(double amount);
+    void moveY(double amount);
+    void moveZ(double amount);
 
     void goTo(const Vector3& position);
-    void goToX(float x);
-    void goToY(float y);
-    void goToZ(float z);
+    void goToX(double x);
+    void goToY(double y);
+    void goToZ(double z);
 
-    Transform(Vector3 position_ = {0.0f, 0.0f, 0.0f}, Vector3 rotation_ = {0.0f, 0.0f, 0.0f},
-              Vector3 scale_ = {1.0f, 1.0f, 1.0f})
+    Transform(Vec3 position_ = {0.0, 0.0, 0.0}, Vec3 rotation_ = {0.0, 0.0, 0.0},
+              Vec3 scale_ = {1.0, 1.0, 1.0})
         : position(position_), rotation(rotation_), scale(scale_) {}
 };
 struct DrawObject {
@@ -198,9 +218,9 @@ private:
 struct MovementObject {
     DrawObject shape;
 
-    Vec3 velocity{0, 0, 0};
-    float drag = 0.0f;
-    float mass = 1.0f;
+    Vec3 velocity{0.0, 0.0, 0.0};
+    double drag = 0.0f;
+    double mass = 1.0f;
 
     Transform& transform() {
         return shape.transform;
@@ -222,7 +242,7 @@ struct MovementObject {
 };
 struct CollisionBox {
     Vector3 center;
-    float radius;
+    double radius;
     void update(const Transform& transform);
 
     bool colliding_with(const CollisionBox& other) const;
@@ -304,31 +324,31 @@ public:
     void setTarget(const Vector3& position);
 
     void move(const Vector3& amount);
-    void moveX(float amount);
-    void moveY(float amount);
-    void moveZ(float amount);
+    void moveX(double amount);
+    void moveY(double amount);
+    void moveZ(double amount);
 
-    inline void moveForward(float amount) {
+    inline void moveForward(double amount) {
         move(Vector3Normalize(direction) * amount);
     }
-    inline void moveBackward(float amount) {
+    inline void moveBackward(double amount) {
         moveForward(-amount);
     }
-    inline void moveRight(float amount) {
+    inline void moveRight(double amount) {
         const Vector3 forward = Vector3Normalize(direction);
         const Vector3 right = Vector3Normalize(Vector3CrossProduct(forward, up));
         move(right * amount);
     }
-    inline void moveLeft(float amount) {
+    inline void moveLeft(double amount) {
         moveRight(-amount);
     }
-    inline void moveUp(float amount) {
+    inline void moveUp(double amount) {
         const Vector3 forward = Vector3Normalize(direction);
         const Vector3 right = Vector3Normalize(Vector3CrossProduct(forward, up));
         const Vector3 cameraUp = Vector3Normalize(Vector3CrossProduct(right, forward));
         move(cameraUp * amount);
     }
-    inline void moveDown(float amount) {
+    inline void moveDown(double amount) {
         moveUp(-amount);
     }
 
@@ -354,19 +374,19 @@ public:
     }
 
     void goTo(const Vector3& pos);
-    void goToX(float x);
-    void goToY(float y);
-    void goToZ(float z);
+    void goToX(double x);
+    void goToY(double y);
+    void goToZ(double z);
 
-    inline void rotateX(float amount) {
+    inline void rotateX(double amount) {
         direction = Vector3Transform(direction, MatrixRotateX(amount));
         refreshTarget();
     }
-    inline void rotateY(float amount) {
+    inline void rotateY(double amount) {
         direction = Vector3Transform(direction, MatrixRotateY(amount));
         refreshTarget();
     }
-    inline void rotateZ(float amount) {
+    inline void rotateZ(double amount) {
         direction = Vector3Transform(direction, MatrixRotateZ(amount));
         refreshTarget();
     }

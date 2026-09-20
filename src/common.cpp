@@ -90,7 +90,7 @@ void CelestialBody::beginOrbit(const CelestialBody& other, double altitude, doub
     const float radius = static_cast<float>(orbitalRadius);
     const float angle = static_cast<float>(inclination);
     Vec3& position = physics->transform.position;
-    const Vec3 dir = Vector3Normalize(otherPhysics.transform().position - position);
+    const Vec3 dir = (otherPhysics.transform().position - position).normalized();
     const Vec3 right = Vector3Normalize(Vector3CrossProduct(dir, Vec3::UP));
     const Vec3 up = Vector3Normalize(Vector3CrossProduct(right, dir));
 
