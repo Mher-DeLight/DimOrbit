@@ -43,6 +43,10 @@ int main(int, char**) {
     });
     explorer->engine.start(0.9);
     explorer->body->beginOrbit(*sun.get(), 5.0f, 0.0f);
+    explorer->createTimeManeuver(dor::Time(5000), dor::maneuver::DeltaV({0.0f, 0.0f, -5e-9f}),
+                                 clock);
+    explorer->scheduleAction(dor::Time(4999), [&]() { controller.disable(); }, clock);
+    explorer->scheduleAction(dor::Time(6000), [&]() { controller.enable(); }, clock);
 
     constexpr float CAM_SPEED = 15.0f;
     constexpr float CAM_LOOK_SPEED = 2.0f;
@@ -60,7 +64,9 @@ int main(int, char**) {
                               lookVec.y * CAM_LOOK_SPEED * delta);
 
             auto inVec = controller.getVec3("thrust");
-            explorer->engine.setMaxThrust(inVec * 1e-7 * delta);
+
+            if (controller.enabled())
+                explorer->engine.setMaxThrust(inVec * 1e-7 * delta);
 
             clock.tick(delta);
             return true;

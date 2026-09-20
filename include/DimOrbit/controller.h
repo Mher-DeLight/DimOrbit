@@ -5,6 +5,12 @@
 namespace DimOrbit {
 
 struct Controller {
+    void enable();
+    void disable();
+    void setEnabled(bool status);
+    bool enabled() const;
+    bool disabled() const;
+
     std::map<std::string, int> keyBinds;
 
     int getKey(const std::string& action) const;
@@ -25,6 +31,9 @@ struct Controller {
                   int forwardKey, int backwardKey);
     void unbindVec3(const std::string& action);
     DimEngineZ::Vec3 getVec3(const std::string& action) const;
+
+private:
+    bool isEnabled = true;
 };
 
 } // namespace DimOrbit

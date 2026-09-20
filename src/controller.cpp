@@ -2,6 +2,25 @@
 
 namespace DimOrbit {
 
+// Enables
+void Controller::enable() {
+    isEnabled = true;
+}
+void Controller::disable() {
+    isEnabled = false;
+}
+void Controller::setEnabled(bool status) {
+    isEnabled = status;
+}
+bool Controller::enabled() const {
+    return isEnabled;
+}
+bool Controller::disabled() const {
+    return !enabled();
+}
+
+// Keys
+
 int Controller::getKey(const std::string& action) const {
     auto it = keyBinds.find(action);
     if (it != keyBinds.end())
@@ -10,6 +29,9 @@ int Controller::getKey(const std::string& action) const {
 }
 
 bool Controller::isActionPressed(const std::string& action) const {
+    if (disabled())
+        return false;
+
     int key = getKey(action);
     if (key != -1)
         return DimEngineZ::input::isKeyPressed(key);
@@ -31,6 +53,9 @@ void Controller::unbindAxis(const std::string& action) {
     keyBinds.erase(action + "_negative");
 }
 float Controller::getAxis(const std::string& axis) const {
+    if (disabled())
+        return 0.0f;
+
     int positiveKey = getKey(axis + "_positive");
     int negativeKey = getKey(axis + "_negative");
     float value = 0.0f;
@@ -51,6 +76,9 @@ void Controller::unbindVec2(const std::string& action) {
     keyBinds.erase(action + "_right");
 }
 DimEngineZ::Vec2 Controller::getVec2(const std::string& action) const {
+    if (disabled())
+        return DimEngineZ::Vec2::ZERO;
+
     int upKey = getKey(action + "_up");
     int downKey = getKey(action + "_down");
     int leftKey = getKey(action + "_left");
@@ -77,6 +105,9 @@ void Controller::unbindVec3(const std::string& action) {
     keyBinds.erase(action + "_backward");
 }
 DimEngineZ::Vec3 Controller::getVec3(const std::string& action) const {
+    if (disabled())
+        return DimEngineZ::Vec3::ZERO;
+
     int upKey = getKey(action + "_up");
     int downKey = getKey(action + "_down");
     int leftKey = getKey(action + "_left");
