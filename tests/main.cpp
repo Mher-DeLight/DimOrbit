@@ -1,5 +1,4 @@
 #include <DimOrbit/DimOrbit.h>
-// todo: make the engine consume fuel proportional to its thrust
 
 int main(int, char**) {
     // setup
