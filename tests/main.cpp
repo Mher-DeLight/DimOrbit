@@ -16,6 +16,7 @@ int main(int, char**) {
     renderer.xzclue.slices = 20;
 
     auto clock = dor::Clock(system);
+    clock.setSpeedScale(2.5);
 
     auto camera = dez::Camera({-5.0f, 5.0f, 5.0f});
     camera.setTarget({0.0f, 0.0f, 0.0f});
@@ -42,6 +43,10 @@ int main(int, char**) {
     });
     explorer->engine.start(0.9);
     explorer->body->beginCircularOrbit(*sun.get(), 5.0f, 0.0f);
+
+    explorer->scheduleAction(dor::Time(4999), [&]() { controller.disable(); }, clock);
+    explorer->createTimeManeuver(dor::Time(5000), dor::maneuver::DeltaV({0.0, 0.0, -5e-9}), clock);
+    explorer->scheduleAction(dor::Time(5500), [&]() { controller.enable(); }, clock);
 
     constexpr float CAM_SPEED = 15.0f;
     constexpr float CAM_LOOK_SPEED = 2.0f;
