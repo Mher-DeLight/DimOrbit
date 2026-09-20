@@ -45,8 +45,8 @@ int main(int, char**) {
     explorer->body->beginOrbit(*sun.get(), 5.0f, 0.0f);
     explorer->createTimeManeuver(dor::Time(5000), dor::maneuver::DeltaV({0.0f, 0.0f, -5e-9f}),
                                  clock);
-    explorer->scheduleAction(dor::Time(4999), [&]() { controller.disable(); }, clock);
-    explorer->scheduleAction(dor::Time(6000), [&]() { controller.enable(); }, clock);
+    clock.doAt(4998, [&]() { controller.disable(); });
+    clock.doAt(6000, [&]() { controller.enable(); });
 
     constexpr float CAM_SPEED = 15.0f;
     constexpr float CAM_LOOK_SPEED = 2.0f;

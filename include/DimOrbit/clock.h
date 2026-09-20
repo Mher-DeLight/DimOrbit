@@ -68,6 +68,8 @@ struct Clock {
     void tick(float delta);
     void bind(const ClockEvent& event);
     void tickBinds();
+    void after(uint64_t ms, const std::function<void()>& action);
+    void doAt(uint64_t ms, const std::function<void()>& action);
 
     // constructors
     Clock() = default;

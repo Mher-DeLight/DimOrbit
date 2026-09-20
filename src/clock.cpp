@@ -148,5 +148,19 @@ void Clock::tickBinds() {
         }
     }
 }
+void Clock::after(uint64_t ms, const std::function<void()>& action) {
+    const uint64_t deadline = time.time() + ms;
+
+    bind({
+        .condition = [this, deadline]() { return time.time() >= deadline; },
+        .action = [action]() { action(); },
+    });
+}
+void Clock::doAt(uint64_t ms, const std::function<void()>& action) {
+    bind({
+        .condition = [this, ms]() { return time.time() >= ms; },
+        .action = [action]() { action(); },
+    });
+}
 
 } // namespace DimOrbit
