@@ -129,6 +129,13 @@ uint64_t Clock::realTime() const {
     return _realTime.time();
 }
 
+void Clock::resume() {
+    start();
+}
+void Clock::pause() {
+    stop();
+}
+
 Clock::Clock(CelestialSystem& startSystem) {
     system = startSystem;
 }

@@ -61,8 +61,13 @@ struct Clock {
     void speedUp(float amount);
     void slowDown(float amount);
     bool isRunning() const;
-    void stop();
+
     void start();
+    void resume();
+
+    void stop();
+    void pause();
+
     uint64_t getTime() const;
     uint64_t realTime() const;
     const Time& realTimer() const;

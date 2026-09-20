@@ -16,6 +16,7 @@ int main(int, char**) {
     renderer.xzclue.slices = 20;
 
     auto clock = dor::Clock(system);
+    clock.pause();
 
     auto camera = dez::Camera({-5.0f, 5.0f, 5.0f});
     camera.setTarget({0.0f, 0.0f, 0.0f});
@@ -44,8 +45,7 @@ int main(int, char**) {
     explorer->body->beginOrbit(*sun.get(), 5.0f, 0.0f);
 
     // real time is required because normal clock time doesn't update when the clock is stopped
-    clock.doAtRealTime(1000, [&]() { clock.stop(); });
-    clock.doAtRealTime(5000, [&]() { clock.start(); });
+    clock.doAtRealTime(10000, [&]() { clock.resume(); });
 
     constexpr float CAM_SPEED = 15.0f;
     constexpr float CAM_LOOK_SPEED = 2.0f;
