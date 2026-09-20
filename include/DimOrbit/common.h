@@ -65,8 +65,8 @@ struct CelestialBody {
     std::string name = "";
 
     // Utility
-    void beginOrbit(const CelestialBody& other, double altitude, double inclination,
-                    double completeness = 0.0);
+    void beginCircularOrbit(const CelestialBody& other, double altitude, double inclination,
+                            double completeness = 0.0);
 
     void tick(float delta);
     CelestialBody(uq<dez::PhysicsObject> physics_, const std::string& name_ = "");

@@ -81,8 +81,8 @@ uq<BasicSpacecraft> CelestialSystem::addSpacecraft(const BasicSpacecraftOptions&
 }
 
 // == GRAVITY BODY ==
-void CelestialBody::beginOrbit(const CelestialBody& other, double altitude, double inclination,
-                               double completeness) {
+void CelestialBody::beginCircularOrbit(const CelestialBody& other, double altitude,
+                                       double inclination, double completeness) {
     const double alteredCompleteness = completeness + (PI);
     const auto& otherPhysics = other.physics->core;
     const double orbitalRadius = static_cast<double>(other.physics->collision.radius) + altitude;
