@@ -150,6 +150,17 @@ void Clock::tick(float delta) {
     tickBinds();
     tickRealBinds();
 }
+void Clock::realTick(float delta) {
+    int ticks = time.tick(delta);
+    _realTime.tick(delta);
+    for (int i = 0; i < ticks; i++) {
+        // we tick by 1ms because ticks returns approximately the amount of milliseconds in delta
+        getSystem().tick(0.001f);
+    }
+    tickBinds();
+    tickRealBinds();
+}
+
 void Clock::bind(const ClockEvent& event) {
     binds.push_back(event);
 }

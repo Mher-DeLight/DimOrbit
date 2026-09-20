@@ -86,6 +86,10 @@ struct Vec3 {
         return Vector3{fl(x), fl(y), fl(z)};
 #undef fl
     }
+    operator std::string() const {
+        return "Vec3{x=" + std::to_string(x) + ", y=" + std::to_string(y) +
+               ", z=" + std::to_string(z) + "}";
+    }
 
     static const Vec3 ZERO;
     static const Vec3 ONE;

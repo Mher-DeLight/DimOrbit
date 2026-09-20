@@ -83,23 +83,25 @@ uq<BasicSpacecraft> CelestialSystem::addSpacecraft(const BasicSpacecraftOptions&
 // == GRAVITY BODY ==
 void CelestialBody::beginCircularOrbit(const CelestialBody& other, double altitude,
                                        double inclination, double completeness) {
-    const double alteredCompleteness = completeness + (PI);
     const auto& otherPhysics = other.physics->core;
-    const double orbitalRadius = static_cast<double>(other.physics->collision.radius) + altitude;
-    const double orbitalSpeed = std::sqrt(math::G * otherPhysics.mass / orbitalRadius);
-    const float radius = static_cast<float>(orbitalRadius);
-    const float angle = static_cast<float>(inclination);
-    Vec3& position = physics->transform.position;
-    const Vec3 dir = (otherPhysics.transform().position - position).normalized();
-    const Vec3 right = Vector3Normalize(Vector3CrossProduct(dir, Vec3::UP));
-    const Vec3 up = Vector3Normalize(Vector3CrossProduct(right, dir));
+    const double radius = static_cast<double>(other.physics->collision.radius) + altitude;
+    const double speed = std::sqrt(math::G * otherPhysics.mass / radius);
 
-    position = Vector3RotateByAxisAngle(dir * radius, up, alteredCompleteness);
+    const float i = static_cast<float>(inclination);
+    const float a = static_cast<float>(completeness);
 
-    physics->core.setVelocity(Vector3RotateByAxisAngle(
-        otherPhysics.velocity + dez::Vec3{0.0f, static_cast<float>(orbitalSpeed * std::sin(angle)),
-                                          static_cast<float>(orbitalSpeed * std::cos(angle))},
-        up, alteredCompleteness));
+    const float sinI = std::sin(i);
+    const float cosI = std::cos(i);
+    const float sinA = std::sin(a);
+    const float cosA = std::cos(a);
+
+    const Vec3 radial{cosA, sinA * sinI, sinA * cosI};
+    const Vec3 tangent{-sinA, cosA * sinI, cosA * cosI};
+
+    physics->transform.position =
+        otherPhysics.transform().position + radial * static_cast<float>(radius);
+
+    physics->core.setVelocity(otherPhysics.velocity + tangent * static_cast<float>(speed));
 }
 CelestialBody::CelestialBody(uq<dez::PhysicsObject> physics_, const std::string& name_)
     : physics(std::move(physics_)), name(name_) {}

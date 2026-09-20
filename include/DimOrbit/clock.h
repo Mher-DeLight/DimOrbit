@@ -74,6 +74,8 @@ struct Clock {
 
     // actions
     void tick(float delta);
+    void realTick(float delta);
+
     void bind(const ClockEvent& event);
     void tickBinds();
     void tickRealBinds();
