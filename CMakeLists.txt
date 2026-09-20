@@ -14,13 +14,13 @@ add_library(DimOrbit
     src/controller.cpp
 )
 target_include_directories(DimOrbit PUBLIC ${CMAKE_SOURCE_DIR}/include)
-target_link_libraries(DimOrbit PRIVATE ${CMAKE_SOURCE_DIR}/include/DimEngineZ/src/DimEngineZ.a)
-target_include_directories(DimOrbit PUBLIC ${CMAKE_SOURCE_DIR}/include/DimEngineZ/include)
+add_subdirectory(${CMAKE_SOURCE_DIR}/include/DimEngineZ)
 
 find_package(raylib REQUIRED)
 target_link_libraries(DimOrbit
     PUBLIC
         raylib
+        DimEngineZ
 )
 
 if (BUILD_TESTS)
