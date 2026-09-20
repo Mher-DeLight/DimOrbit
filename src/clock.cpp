@@ -125,6 +125,9 @@ bool Clock::isRunning() const {
 uint64_t Clock::getTime() const {
     return time.time();
 }
+uint64_t Clock::realTime() const {
+    return _realTime.time();
+}
 
 Clock::Clock(CelestialSystem& startSystem) {
     system = startSystem;
@@ -132,11 +135,13 @@ Clock::Clock(CelestialSystem& startSystem) {
 
 void Clock::tick(float delta) {
     int ticks = time.tick(delta * speedScale);
+    _realTime.tick(delta); // real time isn't affected by the speed scale or pauses
     for (int i = 0; i < ticks; i++) {
         // we tick by 1ms because ticks returns approximately the amount of milliseconds in delta
         getSystem().tick(0.001f);
     }
     tickBinds();
+    tickRealBinds();
 }
 void Clock::bind(const ClockEvent& event) {
     binds.push_back(event);
@@ -148,6 +153,17 @@ void Clock::tickBinds() {
         }
     }
 }
+void Clock::tickRealBinds() {
+    for (auto& bind : realBinds) {
+        if (bind.condition()) {
+            bind.action();
+        }
+    }
+}
+const Time& Clock::realTimer() const {
+    return _realTime;
+}
+
 void Clock::after(uint64_t ms, const std::function<void()>& action) {
     const uint64_t deadline = time.time() + ms;
 
@@ -159,6 +175,12 @@ void Clock::after(uint64_t ms, const std::function<void()>& action) {
 void Clock::doAt(uint64_t ms, const std::function<void()>& action) {
     bind({
         .condition = [this, ms]() { return time.time() >= ms; },
+        .action = [action]() { action(); },
+    });
+}
+void Clock::doAtRealTime(uint64_t ms, const std::function<void()>& action) {
+    realBinds.push_back(ClockEvent{
+        .condition = [this, ms]() { return realTime() >= ms; },
         .action = [action]() { action(); },
     });
 }

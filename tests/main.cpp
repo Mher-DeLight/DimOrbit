@@ -42,10 +42,10 @@ int main(int, char**) {
     });
     explorer->engine.start(0.9);
     explorer->body->beginOrbit(*sun.get(), 5.0f, 0.0f);
-    explorer->createTimeManeuver(dor::Time(5000), dor::maneuver::DeltaV({0.0f, 0.0f, -5e-9f}),
-                                 clock);
-    clock.doAt(4998, [&]() { controller.disable(); });
-    clock.doAt(6000, [&]() { controller.enable(); });
+
+    // real time is required because normal clock time doesn't update when the clock is stopped
+    clock.doAtRealTime(1000, [&]() { clock.stop(); });
+    clock.doAtRealTime(5000, [&]() { clock.start(); });
 
     constexpr float CAM_SPEED = 15.0f;
     constexpr float CAM_LOOK_SPEED = 2.0f;
@@ -84,9 +84,11 @@ int main(int, char**) {
                 renderer.renderName(*explorer.get(), RED);
                 renderer.renderName(*sun.get(), GREEN);
 
-                renderer.draw2DLabel(clock.time.getUTCTime(), dez::Vec2{0.0f, 0.0f});
-                renderer.draw2DLabel("Fuel: " + std::to_string(explorer->fuelTank.fuel()),
+                renderer.draw2DLabel("Game: " + clock.time.getUTCTime(), dez::Vec2::ZERO);
+                renderer.draw2DLabel("Real: " + clock.realTimer().getUTCTime(),
                                      dez::Vec2{0.0f, 30.0f});
+                renderer.draw2DLabel("Fuel: " + std::to_string(explorer->fuelTank.fuel()),
+                                     dez::Vec2{0.0f, 60.0f});
                 return 0;
             });
 

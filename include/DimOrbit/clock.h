@@ -51,6 +51,7 @@ struct Clock {
     float speedScale = 1.0; // single precision is enough i think
     Time time;
     std::vector<ClockEvent> binds;
+    std::vector<ClockEvent> realBinds;
 
     // configuration
     CelestialSystem& getSystem(const std::string& errormsg = "");
@@ -63,13 +64,17 @@ struct Clock {
     void stop();
     void start();
     uint64_t getTime() const;
+    uint64_t realTime() const;
+    const Time& realTimer() const;
 
     // actions
     void tick(float delta);
     void bind(const ClockEvent& event);
     void tickBinds();
+    void tickRealBinds();
     void after(uint64_t ms, const std::function<void()>& action);
     void doAt(uint64_t ms, const std::function<void()>& action);
+    void doAtRealTime(uint64_t ms, const std::function<void()>& action);
 
     // constructors
     Clock() = default;
@@ -77,6 +82,7 @@ struct Clock {
 
 private:
     float ssAccum = 1.0f;
+    Time _realTime;
 };
 
 }; // namespace DimOrbit
