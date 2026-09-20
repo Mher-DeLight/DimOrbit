@@ -22,9 +22,23 @@ Vec3 Vec3::normalized() const {
     }
     return Vec3::ZERO;
 }
+Vec3 Vec3::relativeTo(const Vec3& other) const {
+    return (*this) - other;
+}
+Vec3 Vec3::to(const Vec3& other) const {
+    return other - (*this);
+}
+Vec3 Vec3::directionTo(const Vec3& other) const {
+    return to(other).normalized();
+}
+double Vec3::distanceTo(const Vec3& other) const {
+    return to(other).magnitude();
+}
+
 bool Vec3::isZero() const {
     return *this == Vec3::ZERO;
 }
+
 const Vec3 Vec3::ZERO{0.0, 0.0, 0.0};
 const Vec3 Vec3::ONE{1.0, 1.0, 1.0};
 const Vec3 Vec3::UP{0.0, 1.0, 0.0};
@@ -50,10 +64,10 @@ const Vec2 Vec2::RIGHT{1.0f, 0.0f};
 
 // == TRANSFORM ==
 float Transform::magnitude() const {
-    return Vector3Length(position);
+    return position.magnitude();
 }
 float Transform::rotationMagnitude() const {
-    return Vector3Length(rotation);
+    return rotation.magnitude();
 }
 void Transform::rotateX(double amount) {
     rotation.x += amount;

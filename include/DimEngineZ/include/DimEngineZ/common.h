@@ -23,8 +23,13 @@ struct Vec3 {
 
     double sqr_magnitude() const;
     double magnitude() const;
-    bool isZero() const;
     Vec3 normalized() const;
+    Vec3 relativeTo(const Vec3& other) const;
+    Vec3 to(const Vec3& other) const;
+    Vec3 directionTo(const Vec3& other) const;
+    double distanceTo(const Vec3& other) const;
+
+    bool isZero() const;
 
     Vec3 operator+(const Vec3& other) const {
         return Vec3{x + other.x, y + other.y, z + other.z};
