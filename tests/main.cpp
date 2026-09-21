@@ -53,6 +53,10 @@ int main(int, char**) {
                 renderer.doin3d(camera, [&]() {
                     // render the system in 3d mode
                     renderer.render(system);
+                    renderer.displayVector(spacecraft->body->gravity.lastAcceleration,
+                                           spacecraft->physics->transform.position);
+                    renderer.displayVector(spacecraft->physics->core.velocity,
+                                           spacecraft->physics->transform.position, YELLOW);
                     return 0;
                 });
 
