@@ -9,7 +9,7 @@ int main(int, char**) {
     // initialization
     dez::manager::init(1000, 800, "Mission Simulation");
 
-    auto camera = dez::Camera(Vec3{5.0, 2.0, 0.0});
+    auto camera = dez::Camera(Vec3{0.0, 2.0, 5.0});
     camera.setTarget(Vec3::ZERO);
 
     auto system = dor::CelestialSystem();
@@ -19,6 +19,13 @@ int main(int, char**) {
     renderer.xzclue.height = 0.0f;
 
     auto clock = dor::Clock(system);
+
+    auto controller = dor::Controller();
+    controller.bindVec3(
+        "move", KEY_SPACE, KEY_LEFT_SHIFT, KEY_A, KEY_D, KEY_S,
+        KEY_W); // forward and backward are inverted because of look-around weirdness
+
+    constexpr float CAM_SPEED = 3.0; // no need for double precision here
 
     // bodies
     auto earth = system.addBody(dor::BodyOptions{
@@ -43,6 +50,8 @@ int main(int, char**) {
 
         // physics
         [&](float delta) {
+            camera.move(controller.getVec3("move") * delta * CAM_SPEED);
+
             clock.tick(delta);
             return true;
         },
