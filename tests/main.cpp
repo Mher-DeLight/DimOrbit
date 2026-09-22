@@ -51,6 +51,7 @@ int main(int, char**) {
         // physics
         [&](float delta) {
             camera.move(controller.getVec3("move") * delta * CAM_SPEED);
+            dez::logger::flushLog(controller.getVec3("move"));
 
             clock.tick(delta);
             return true;

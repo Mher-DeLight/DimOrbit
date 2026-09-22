@@ -18,9 +18,17 @@ template <typename T> void log(const T& message, bool newline = true) {
         outputStream << "\n";
 }
 
-template <typename T> void flushLog(const T& message, bool newline = true) {
-    log(message, newline);
+template <typename T>
+    requires std::convertible_to<T, std::string>
+void flushLog(const T& message, bool newline = true) {
+    log(std::string(message), newline);
     flush();
 }
 
+template <typename T>
+    requires(!std::convertible_to<T, std::string>)
+void flushLog(const T& message, bool newline = true) {
+    log(message, newline);
+    flush();
+}
 }; // namespace DimEngineZ::logger
