@@ -10,7 +10,7 @@ _DimOrbit_ is a Newtonian spacecraft/orbit simulator based on my Raylib wrapper/
 ### Images
 ![Photo of the Sun and a spacecraft called "Explorer" in DimOrbit](md-assets/explorer-ssi.png)
 
-### Demonstration Photos
+### Demonstration Videos
 * [Demonstration Video #1](https://www.youtube.com/watch?v=Z1Se9Q21jNo)
 * [Demonstration Video #2](https://www.youtube.com/watch?v=9sX14I9Tfn8)
 
