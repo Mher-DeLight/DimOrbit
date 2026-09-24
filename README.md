@@ -4,8 +4,17 @@ _DimOrbit_ is a Newtonian spacecraft/orbit simulator based on my Raylib wrapper/
 > [!WARNING]
 > Some changes are made to _DimEngineZ_ directly from _DimOrbit_ without modifying the original copy. This may include bug fixes that may not be mirrored immediately to _DimEngineZ_.
 
+---
+
 ## Videos & Images
+### Images
 ![Photo of the Sun and a spacecraft called "Explorer" in DimOrbit](md-assets/explorer-ssi.png)
+
+### Demonstration Photos
+* [Demonstration Video #1](https://www.youtube.com/watch?v=Z1Se9Q21jNo)
+* [Demonstration Video #2](https://www.youtube.com/watch?v=9sX14I9Tfn8)
+
+---
 
 ## Example
 Here's an example of the sun, an XZ Clue plane, and a spacecraft called "Explorer" that orbits around it.
