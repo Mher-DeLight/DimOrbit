@@ -9,7 +9,9 @@ int main(int, char**) {
     // initialization
     dez::manager::init(1000, 800, "Mission Simulation");
 
-    auto camera = dez::Camera(Vec3{0.0, 2.0, 5.0});
+    auto camera = dez::Camera(Vec3{3.0, 3.0, 3.0}, dez::CameraOptions{
+                                                       .fovy = 110.0,
+                                                   });
     camera.setTarget(Vec3::ZERO);
 
     auto system = dor::CelestialSystem();
@@ -22,10 +24,10 @@ int main(int, char**) {
 
     auto controller = dor::Controller();
     controller.bindVec3(
-        "move", KEY_SPACE, KEY_LEFT_SHIFT, KEY_A, KEY_D, KEY_S,
-        KEY_W); // forward and backward are inverted because of look-around weirdness
-
-    constexpr float CAM_SPEED = 3.0; // no need for double precision here
+        "move", KEY_SPACE, KEY_LEFT_SHIFT, KEY_A, KEY_D, KEY_W,
+        KEY_S); // forward and backward are inverted because of look-around weirdness
+    controller.bindVec2("look", KEY_T, KEY_G, KEY_F, KEY_H);
+    controller.bindVec3("thrust", KEY_RIGHT_SHIFT, KEY_KP_1, KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP);
 
     // bodies
     auto earth = system.addBody(dor::BodyOptions{
@@ -41,8 +43,15 @@ int main(int, char**) {
         .color = RED,
         .mass = 1e-9,
         .collide = false,
+        .specificImpulse = 1e-9,
     });
+    spacecraft->engine.start(spacecraft->physics->core.mass);
     spacecraft->body->beginCircularOrbit(*earth.get(), 3.0, PI);
+
+    // constants
+    constexpr float CAM_SPEED = 3.0f;
+    constexpr float CAM_LOOK_SPEED = 1.75f;
+    constexpr float THRUST_MULTIPLIER = 2.0f;
 
     // main loop
     int exit_code = dez::manager::fixedloop(
@@ -50,8 +59,16 @@ int main(int, char**) {
 
         // physics
         [&](float delta) {
-            camera.move(controller.getVec3("move") * delta * CAM_SPEED);
-            dez::logger::flushLog(controller.getVec3("move"));
+            Vec3 movVec = controller.getVec3("move") * delta * CAM_SPEED;
+            camera.moveForward(movVec.z);
+            camera.moveRight(movVec.x);
+            camera.moveUp(movVec.y);
+
+            dez::Vec2 lookVec = controller.getVec2("look") * CAM_LOOK_SPEED;
+            camera.lookAround(-lookVec.x * delta, lookVec.y * delta);
+
+            Vec3 thrust = controller.getVec3("thrust") * THRUST_MULTIPLIER;
+            spacecraft->engine.setMaxThrust(thrust);
 
             clock.tick(delta);
             return true;
@@ -63,10 +80,10 @@ int main(int, char**) {
                 renderer.doin3d(camera, [&]() {
                     // render the system in 3d mode
                     renderer.render(system);
-                    renderer.displayVector(spacecraft->body->gravity.lastAcceleration,
-                                           spacecraft->physics->transform.position);
                     renderer.displayVector(spacecraft->physics->core.velocity,
                                            spacecraft->physics->transform.position, YELLOW);
+                    renderer.displayVector(spacecraft->engine.maxThrust,
+                                           spacecraft->physics->transform.position, RED);
                     return 0;
                 });
 
